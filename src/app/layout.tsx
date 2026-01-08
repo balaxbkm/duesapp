@@ -1,23 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Serif_Display, Roboto_Condensed } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 
 import { AuthProvider } from "@/providers/AuthProvider";
 import { BottomNav } from "@/components/layout/BottomNav";
-
-const titleFont = DM_Serif_Display({
-  weight: "400",
-  style: ["normal", "italic"],
-  subsets: ["latin"],
-  variable: "--font-title",
-});
-
-const bodyFont = Roboto_Condensed({
-  subsets: ["latin"],
-  variable: "--font-body",
-  style: ["normal", "italic"],
-});
 
 export const metadata: Metadata = {
   title: "DuesApp - Smart Loan Reminders",
@@ -46,7 +32,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${titleFont.variable} ${bodyFont.variable} antialiased bg-background text-foreground transition-colors duration-300`}
+        className="antialiased bg-background text-foreground transition-colors duration-300"
       >
         <ThemeProvider>
           <AuthProvider>
