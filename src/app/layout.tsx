@@ -8,6 +8,7 @@ import { BottomNav } from "@/components/layout/BottomNav";
 
 const titleFont = DM_Serif_Display({
   weight: "400",
+  style: ["normal", "italic"],
   subsets: ["latin"],
   variable: "--font-title",
 });
@@ -15,6 +16,7 @@ const titleFont = DM_Serif_Display({
 const bodyFont = Roboto_Condensed({
   subsets: ["latin"],
   variable: "--font-body",
+  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
