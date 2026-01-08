@@ -41,8 +41,17 @@ export default function LandingPage() {
     <div className="flex flex-col items-center justify-center min-h-screen p-6 text-center bg-background bg-gradient-to-br from-background via-neon-lime/5 to-neon-purple/5 transition-colors duration-300">
       <div className="w-full max-w-md space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
         <div className="space-y-2">
-          <div className="w-20 h-20 bg-primary/20 rounded-3xl flex items-center justify-center mx-auto mb-6 backdrop-blur-xl shadow-xl shadow-primary/20 rotate-3 transition-transform hover:rotate-6 border border-primary/20">
-            <span className="text-4xl">💸</span>
+          <div className="relative w-28 h-28 mx-auto mb-6 group">
+            <div className="absolute inset-0 bg-primary/20 rounded-full blur-3xl group-hover:bg-primary/30 transition-colors duration-500 animate-pulse" />
+            <div className="relative w-full h-full transform transition-transform hover:scale-110 duration-500">
+              <Image
+                src="/wallet-3d.png"
+                alt="DuesApp Logo"
+                fill
+                className="object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.3)]"
+                priority
+              />
+            </div>
           </div>
           <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl bg-clip-text text-transparent bg-gradient-to-r from-neon-lime to-neon-purple">
             DuesApp
