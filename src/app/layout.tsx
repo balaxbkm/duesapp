@@ -1,3 +1,4 @@
+// Final font stabilization
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/providers/ThemeProvider";
