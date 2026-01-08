@@ -1,24 +1,20 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Outfit } from "next/font/google"; // Adding Outfit for that premium feel
+import { DM_Serif_Display, Roboto_Condensed } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 
 import { AuthProvider } from "@/providers/AuthProvider";
 import { BottomNav } from "@/components/layout/BottomNav";
 
-const outfit = Outfit({
+const titleFont = DM_Serif_Display({
+  weight: "400",
   subsets: ["latin"],
-  variable: "--font-outfit",
+  variable: "--font-title",
 });
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const bodyFont = Roboto_Condensed({
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: "--font-body",
 });
 
 export const metadata: Metadata = {
@@ -48,7 +44,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${outfit.variable} ${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground font-sans selection:bg-neon-lime/30 transition-colors duration-300`}
+        className={`${titleFont.variable} ${bodyFont.variable} antialiased bg-background text-foreground transition-colors duration-300`}
       >
         <ThemeProvider>
           <AuthProvider>
