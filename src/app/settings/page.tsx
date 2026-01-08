@@ -1,0 +1,305 @@
+"use client";
+import { useState, useEffect } from 'react';
+import { ArrowLeft, Bell, Moon, Shield, Lock, ChevronRight, Globe, Smartphone, X, Check } from 'lucide-react';
+import Link from 'next/link';
+
+import { useTheme } from '@/providers/ThemeProvider';
+
+export default function SettingsPage() {
+    const { theme, toggleTheme } = useTheme();
+
+    const [settings, setSettings] = useState({
+        notifications: true,
+        biometric: false,
+        currency: 'INR',
+        pin: '1234'
+    });
+
+    const [showCurrencyModal, setShowCurrencyModal] = useState(false);
+    const [showPinModal, setShowPinModal] = useState(false);
+    const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+    // PIN States
+    const [pinInput, setPinInput] = useState("");
+    const [pinStep, setPinStep] = useState<'verify' | 'new' | 'confirm'>('verify');
+    const [tempNewPin, setTempNewPin] = useState("");
+
+    // Load settings on mount
+    useEffect(() => {
+        const loadSettings = () => {
+            const storedCurrency = localStorage.getItem('settings_currency') || 'INR';
+            const storedNotif = localStorage.getItem('settings_notifications') === 'true';
+            const storedBio = localStorage.getItem('settings_biometric') === 'true';
+            const storedPin = localStorage.getItem('settings_pin') || '1234';
+
+            setSettings({
+                notifications: localStorage.getItem('settings_notifications') !== null ? storedNotif : true,
+                biometric: storedBio,
+                currency: storedCurrency,
+                pin: storedPin
+            });
+        };
+        loadSettings();
+    }, []);
+
+    const showToast = (msg: string) => {
+        setToastMessage(msg);
+        setTimeout(() => setToastMessage(null), 3000);
+    };
+
+    const updateSetting = (key: string, value: any) => {
+        if (key === 'darkMode') {
+            toggleTheme();
+            return;
+        }
+
+        setSettings(prev => ({ ...prev, [key]: value }));
+        localStorage.setItem(`settings_${key}`, String(value));
+
+        if (key !== 'pin') {
+            showToast(`${key.charAt(0).toUpperCase() + key.slice(1)} updated`);
+        }
+    };
+
+    const currencies = [
+        { code: 'USD', name: 'US Dollar ($)' },
+        { code: 'INR', name: 'Indian Rupee (₹)' },
+        { code: 'EUR', name: 'Euro (€)' },
+        { code: 'GBP', name: 'British Pound (£)' },
+    ];
+
+    const SettingItem = ({ icon: Icon, title, subtitle, type = 'toggle', value, onClick }: any) => (
+        <div
+            onClick={type === 'link' || type === 'modal' ? onClick : undefined}
+            className={`flex items-center justify-between p-4 bg-card border border-border rounded-2xl mb-3 ${type !== 'toggle' ? 'active:scale-[0.98] cursor-pointer hover:bg-accent/50' : ''} transition-all`}
+        >
+            <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center text-muted-foreground">
+                    <Icon size={20} />
+                </div>
+                <div>
+                    <h3 className="text-foreground font-medium text-sm">{title}</h3>
+                    {subtitle && <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>}
+                </div>
+            </div>
+
+            {type === 'toggle' ? (
+                <button
+                    onClick={(e) => { e.stopPropagation(); onClick(!value); }}
+                    className={`w-12 h-6 rounded-full p-1 transition-colors duration-300 relative ${value ? 'bg-neon-lime' : 'bg-muted'}`}
+                >
+                    <div className={`w-4 h-4 rounded-full bg-background shadow-sm transition-transform duration-300 ${value ? 'translate-x-6' : 'translate-x-0'}`} />
+                </button>
+            ) : (
+                <ChevronRight size={18} className="text-muted-foreground" />
+            )}
+        </div>
+    );
+
+    return (
+        <div className="min-h-screen bg-background pb-32 px-6 pt-8 font-sans selection:bg-neon-lime/30 relative transition-colors duration-300">
+
+            {/* Toast */}
+            {toastMessage && (
+                <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[100] bg-neon-lime text-black px-6 py-3 rounded-full font-bold shadow-lg animate-in fade-in slide-in-from-top-4 whitespace-nowrap">
+                    {toastMessage}
+                </div>
+            )}
+
+            {/* Creative Header */}
+            <div className="flex items-center justify-between mb-8 pt-4">
+                <Link href="/profile" className="w-12 h-12 rounded-full border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-all active:scale-95 group">
+                    <ArrowLeft size={20} className="group-hover:-translate-x-0.5 transition-transform" />
+                </Link>
+            </div>
+
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold text-foreground tracking-tight mb-2">App Settings</h1>
+                <p className="text-muted-foreground text-sm">Manage your preferences and security.</p>
+            </div>
+
+            <div className="space-y-6">
+                <div>
+                    <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 ml-1">General</h2>
+                    <SettingItem
+                        icon={Bell}
+                        title="Notifications"
+                        subtitle={settings.notifications ? "On" : "Off"}
+                        value={settings.notifications}
+                        onClick={(val: boolean) => updateSetting('notifications', val)}
+                    />
+                    <SettingItem
+                        icon={Globe}
+                        title="Currency"
+                        subtitle={currencies.find(c => c.code === settings.currency)?.name || settings.currency}
+                        type="modal"
+                        onClick={() => setShowCurrencyModal(true)}
+                    />
+                </div>
+
+                <div>
+                    <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 ml-1">Security</h2>
+                    <SettingItem
+                        icon={Smartphone}
+                        title="Biometric Login"
+                        subtitle={settings.biometric ? "Enabled" : "Disabled"}
+                        value={settings.biometric}
+                        onClick={(val: boolean) => updateSetting('biometric', val)}
+                    />
+                    <SettingItem
+                        icon={Lock}
+                        title="Change PIN"
+                        type="modal"
+                        onClick={() => setShowPinModal(true)}
+                    />
+                </div>
+
+                <div>
+                    <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 ml-1">Appearance</h2>
+                    <SettingItem
+                        icon={Moon}
+                        title="Dark Mode"
+                        subtitle={theme === 'dark' ? "On" : "Off"}
+                        value={theme === 'dark'}
+                        onClick={(val: boolean) => updateSetting('darkMode', val)}
+                    />
+                </div>
+            </div>
+
+            {/* Currency Modal */}
+            {showCurrencyModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm animate-in fade-in">
+                    <div className="bg-card w-full max-w-sm rounded-[32px] border border-border p-6 shadow-2xl">
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-xl font-bold text-foreground">Select Currency</h3>
+                            <button onClick={() => setShowCurrencyModal(false)} className="p-2 bg-accent rounded-full text-muted-foreground hover:text-foreground"><X size={18} /></button>
+                        </div>
+                        <div className="space-y-2">
+                            {currencies.map(c => (
+                                <button
+                                    key={c.code}
+                                    onClick={() => {
+                                        updateSetting('currency', c.code);
+                                        setShowCurrencyModal(false);
+                                    }}
+                                    className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all ${settings.currency === c.code ? 'bg-neon-lime/10 border-neon-lime text-neon-lime' : 'bg-muted/50 border-transparent text-muted-foreground hover:bg-muted'}`}
+                                >
+                                    <span className="font-bold">{c.code}</span>
+                                    <span className="text-sm opacity-70">{c.name}</span>
+                                    {settings.currency === c.code && <Check size={18} />}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* PIN Modal */}
+            {showPinModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm animate-in fade-in">
+                    <div className="bg-card w-full max-w-xs rounded-[32px] border border-border p-6 shadow-2xl text-center">
+                        <div className="w-12 h-12 rounded-full bg-accent mx-auto flex items-center justify-center mb-4 text-muted-foreground">
+                            <Lock size={24} />
+                        </div>
+
+                        <h3 className="text-xl font-bold text-foreground mb-2">
+                            {pinStep === 'verify' ? "Enter Current PIN" : pinStep === 'new' ? "Set New PIN" : "Confirm New PIN"}
+                        </h3>
+                        <p className="text-muted-foreground text-xs mb-6 h-4">
+                            {pinStep === 'verify' ? "Enter your current 4-digit PIN" : pinStep === 'new' ? "Enter a 4-digit PIN" : "Re-enter to confirm"}
+                        </p>
+
+                        {/* Dots */}
+                        <div className="flex justify-center gap-4 mb-8">
+                            {[0, 1, 2, 3].map(i => (
+                                <div
+                                    key={i}
+                                    className={`w-3 h-3 rounded-full transition-all duration-300 ${i < pinInput.length ? 'bg-neon-lime scale-110 shadow-[0_0_8px_hsl(var(--neon-lime))]' : 'bg-muted'}`}
+                                />
+                            ))}
+                        </div>
+
+                        {/* Keypad */}
+                        <div className="grid grid-cols-3 gap-3 mb-6">
+                            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
+                                <button
+                                    key={num}
+                                    onClick={() => {
+                                        if (pinInput.length < 4) setPinInput(prev => prev + num);
+                                    }}
+                                    className="h-12 rounded-full bg-accent text-foreground font-bold text-lg hover:bg-muted active:scale-95 transition-all"
+                                >
+                                    {num}
+                                </button>
+                            ))}
+                            <div />
+                            <button
+                                onClick={() => {
+                                    if (pinInput.length < 4) setPinInput(prev => prev + "0");
+                                }}
+                                className="h-12 rounded-full bg-accent text-foreground font-bold text-lg hover:bg-muted active:scale-95 transition-all"
+                            >
+                                0
+                            </button>
+                            <button
+                                onClick={() => setPinInput(prev => prev.slice(0, -1))}
+                                className="h-12 rounded-full bg-transparent text-muted-foreground flex items-center justify-center hover:text-foreground active:scale-95 transition-all"
+                            >
+                                <ArrowLeft size={24} />
+                            </button>
+                        </div>
+
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => {
+                                    setShowPinModal(false);
+                                    setPinInput("");
+                                    setPinStep("verify");
+                                }}
+                                className="flex-1 py-3 rounded-full bg-accent text-foreground font-bold text-sm hover:bg-muted"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => {
+                                    if (pinInput.length !== 4) return;
+
+                                    if (pinStep === 'verify') {
+                                        if (pinInput === (settings as any).pin) {
+                                            setPinStep('new');
+                                            setPinInput("");
+                                        } else {
+                                            showToast("Incorrect PIN");
+                                            setPinInput("");
+                                        }
+                                    } else if (pinStep === 'new') {
+                                        setTempNewPin(pinInput);
+                                        setPinStep('confirm');
+                                        setPinInput("");
+                                    } else if (pinStep === 'confirm') {
+                                        if (pinInput === tempNewPin) {
+                                            updateSetting('pin', pinInput); // Save the new PIN
+                                            showToast("PIN Updated Successfully");
+                                            setShowPinModal(false);
+                                            setPinStep('verify');
+                                            setPinInput("");
+                                            setTempNewPin("");
+                                        } else {
+                                            showToast("PINs do not match");
+                                            setPinStep('new');
+                                            setPinInput("");
+                                        }
+                                    }
+                                }}
+                                disabled={pinInput.length !== 4}
+                                className={`flex-1 py-3 rounded-full font-bold text-sm transition-all ${pinInput.length === 4 ? 'bg-neon-lime text-black hover:brightness-110 shadow-[0_0_15px_rgba(223,255,79,0.3)]' : 'bg-muted text-muted-foreground cursor-not-allowed'}`}
+                            >
+                                {pinStep === 'confirm' ? 'Confirm' : 'Next'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}

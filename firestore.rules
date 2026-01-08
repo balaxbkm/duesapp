@@ -1,0 +1,47 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if the user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper function to check if the user owns the data
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Users collection: Document ID matches User UID
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+
+    // Loans collection: Secured by user_id field
+    match /loans/{loanId} {
+      allow create: if isOwner(request.resource.data.user_id);
+      allow update, delete: if isOwner(resource.data.user_id);
+      // Allow read if doc doesn't exist (404) or if owner
+      allow read: if resource == null || isOwner(resource.data.user_id);
+    }
+
+    // Payments collection: Secured by user_id field
+    match /payments/{paymentId} {
+      allow create: if isOwner(request.resource.data.user_id);
+      allow update, delete: if isOwner(resource.data.user_id);
+      allow read: if resource == null || isOwner(resource.data.user_id);
+    }
+
+    // Notifications collection: Secured by userId field (camelCase)
+    match /notifications/{notificationId} {
+      allow create: if isOwner(request.resource.data.userId);
+      allow update, delete: if isOwner(resource.data.userId);
+      allow read: if resource == null || isOwner(resource.data.userId);
+    }
+    
+    // Default deny ALL other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

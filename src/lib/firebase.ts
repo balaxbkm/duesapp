@@ -1,0 +1,31 @@
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { getFunctions } from "firebase/functions";
+import { getMessaging } from "firebase/messaging";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyB9lWKBPYZZvm2cCmN_kRcpvCh_o1IFnIo",
+    authDomain: "duesapp-30141.firebaseapp.com",
+    projectId: "duesapp-30141",
+    storageBucket: "duesapp-30141.firebasestorage.app",
+    messagingSenderId: "640100436332",
+    appId: "1:640100436332:web:793e1636b126cfaa7e4b49",
+    measurementId: "G-DSZ03SRJT3"
+};
+
+// Initialize Firebase
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+const auth = getAuth(app);
+const db = getFirestore(app);
+const functions = getFunctions(app);
+
+// Messaging is only supported in window environment
+let messaging = null;
+if (typeof window !== "undefined") {
+    // messaging = getMessaging(app); 
+    // Note: FCM requires a service worker and VAPID key setup. 
+    // Initializing it conditionally to prevent SSR errors.
+}
+
+export { app, auth, db, functions, messaging };
