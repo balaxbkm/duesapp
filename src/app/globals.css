@@ -30,10 +30,10 @@
   --color-card-foreground: hsl(var(--card-foreground));
 
   /* Custom Status Colors & Neons */
-  --color-neon-lime: hsl(var(--neon-lime));
-  --color-neon-purple: hsl(265 85% 65%);
+  --color-neon-lime: hsl(71 100% 41%);
+  --color-neon-purple: hsl(71 100% 41%);
 
-  --color-status-active: hsl(265 85% 65%);
+  --color-status-active: hsl(71 100% 41%);
   --color-status-completed: hsl(0 0% 100%);
 
   --radius-lg: var(--radius);
@@ -53,12 +53,12 @@
     --popover: 240 10% 4%;
     --popover-foreground: 0 0% 100%;
 
-    --primary: 265 85% 65%;
-    /* Neon Purple is the new main accent */
-    --primary-foreground: 0 0% 100%;
+    --primary: 71 100% 41%;
+    /* #abd300 - The New Accent */
+    --primary-foreground: 240 10% 3.9%;
 
-    --secondary: 265 85% 65%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 71 100% 41%;
+    --secondary-foreground: 240 10% 3.9%;
 
     --muted: 240 6% 15%;
     --muted-foreground: 240 5% 65%;
@@ -71,16 +71,15 @@
 
     --border: 240 6% 15%;
     --input: 240 6% 15%;
-    --ring: 265 85% 65%;
+    --ring: 71 100% 41%;
 
     --radius: 1.5rem;
 
     /* Custom Variables */
-    --neon-lime: 265 85% 65%;
-    /* Redirect lime to purple for consistency */
-    --neon-purple: 265 85% 65%;
+    --neon-lime: 71 100% 41%;
+    --neon-purple: 71 100% 41%;
 
-    --status-active: 265 85% 65%;
+    --status-active: 71 100% 41%;
     --status-completed: 0 0% 100%;
   }
 
@@ -95,15 +94,14 @@
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 4%;
 
-    /* Unified Accent: Neon Purple */
-    --primary: 265 85% 65%;
+    /* Unified Accent: #abd300 */
+    --primary: 71 100% 41%;
     --primary-foreground: 0 0% 100%;
 
-    --neon-lime: 265 85% 65%;
-    --neon-purple: 265 85% 65%;
+    --neon-lime: 71 100% 41%;
+    --neon-purple: 71 100% 41%;
 
-    --secondary: 104 27% 33%;
-    /* Move forest green to secondary if needed, or just keep purple */
+    --secondary: 71 100% 41%;
     --secondary-foreground: 0 0% 100%;
 
     --muted: 240 5% 96%;
@@ -117,7 +115,7 @@
 
     --border: 240 6% 90%;
     --input: 240 6% 90%;
-    --ring: 265 85% 65%;
+    --ring: 71 100% 41%;
   }
 
   /* Force dark mode everywhere */

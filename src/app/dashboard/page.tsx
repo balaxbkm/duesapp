@@ -179,7 +179,7 @@ export default function Dashboard() {
                 </div>
                 <div className="h-3 w-full bg-card border border-border/50 rounded-full overflow-hidden relative">
                     <div
-                        className="h-full bg-primary rounded-full shadow-[0_0_15px_rgba(124,58,237,0.4)]"
+                        className="h-full bg-primary rounded-full shadow-[0_0_15px_rgba(171,211,0,0.4)]"
                         style={{ width: `${progressPercent}%` }}
                     ></div>
                     {/* Striped Pattern Overlay */}

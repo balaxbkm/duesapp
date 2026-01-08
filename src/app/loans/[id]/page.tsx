@@ -230,7 +230,7 @@ export default function LoanDetailsPage() {
             <div className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-background via-background to-transparent pt-10 pb-8 z-20">
                 <button
                     onClick={openPaymentModal}
-                    className="w-full py-4 rounded-full bg-neon-purple text-white font-bold text-lg shadow-[0_8px_30px_rgba(124,58,237,0.4)] hover:shadow-[0_8px_40px_rgba(124,58,237,0.6)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                    className="w-full py-4 rounded-full bg-primary text-black font-bold text-lg shadow-[0_8px_30px_rgba(171,211,0,0.4)] hover:shadow-[0_8px_40px_rgba(171,211,0,0.6)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                 >
                     <Wallet size={20} />
                     Pay Now
