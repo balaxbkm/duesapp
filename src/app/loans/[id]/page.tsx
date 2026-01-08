@@ -14,6 +14,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis } from '
 export default function LoanDetailsPage() {
     const { id } = useParams() as { id: string };
     const searchParams = useSearchParams();
+    const router = useRouter();
     const { user, loading: authLoading } = useAuth();
 
     useEffect(() => {
