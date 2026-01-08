@@ -42,25 +42,21 @@
 
 @layer base {
   :root {
-    /* DEFAULT TO DARK MODE VALUES for the whole app as requested */
+    /* DEFAULT TO DARK MODE VALUES */
     --background: 240 10% 4%;
-    /* #0a0a0b - Deep dark */
     --foreground: 0 0% 100%;
 
     --card: 240 6% 10%;
-    /* #18181b - Zinc 900ish */
     --card-foreground: 0 0% 100%;
 
     --popover: 240 10% 4%;
     --popover-foreground: 0 0% 100%;
 
-    --primary: 73 100% 65%;
-    /* #DFFF4F - The Neon Lime */
-    --primary-foreground: 240 10% 3.9%;
-    /* Black text on lime */
+    --primary: 265 85% 65%;
+    /* Neon Purple is the new main accent */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 263 70% 50%;
-    /* #7c3aed - Neon Purple */
+    --secondary: 265 85% 65%;
     --secondary-foreground: 0 0% 100%;
 
     --muted: 240 6% 15%;
@@ -74,19 +70,17 @@
 
     --border: 240 6% 15%;
     --input: 240 6% 15%;
-    --ring: 73 100% 65%;
+    --ring: 265 85% 65%;
 
     --radius: 1.5rem;
-    /* Rounder 24px */
 
     /* Custom Variables */
-    --neon-lime: 73 100% 65%;
+    --neon-lime: 265 85% 65%;
+    /* Redirect lime to purple for consistency */
     --neon-purple: 265 85% 65%;
 
     --status-active: 265 85% 65%;
-    /* Purple for active text */
     --status-completed: 0 0% 100%;
-    /* White for completed */
   }
 
   /* Light Mode Overrides */
@@ -100,15 +94,15 @@
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 4%;
 
-    /* New Light Mode Accent: Forest Green */
-    --primary: 104 27% 33%;
+    /* Unified Accent: Neon Purple */
+    --primary: 265 85% 65%;
     --primary-foreground: 0 0% 100%;
 
-    /* Also update semantic neon-lime to be this green in light mode 
-       so components using bg-neon-lime switch color */
-    --neon-lime: 104 27% 33%;
+    --neon-lime: 265 85% 65%;
+    --neon-purple: 265 85% 65%;
 
-    --secondary: 265 85% 65%;
+    --secondary: 104 27% 33%;
+    /* Move forest green to secondary if needed, or just keep purple */
     --secondary-foreground: 0 0% 100%;
 
     --muted: 240 5% 96%;
@@ -122,7 +116,7 @@
 
     --border: 240 6% 90%;
     --input: 240 6% 90%;
-    --ring: 104 27% 33%;
+    --ring: 265 85% 65%;
   }
 
   /* Force dark mode everywhere */

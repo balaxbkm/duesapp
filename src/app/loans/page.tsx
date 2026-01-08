@@ -35,14 +35,14 @@ export default function LoansPage() {
     });
 
     return (
-        <div className="p-6 pb-32 space-y-6 min-h-screen bg-black font-sans selection:bg-neon-lime/30">
-            <h1 className="text-xl font-medium text-white tracking-wide mb-4">All Loans</h1>
+        <div className="p-6 pb-32 space-y-6 min-h-screen bg-background font-sans selection:bg-primary/30">
+            <h1 className="text-xl font-medium text-foreground tracking-wide mb-4">All Loans</h1>
 
-            <div className="flex items-center gap-3 bg-[#1C1C1E] p-4 rounded-full border border-white/5 sticky top-4 z-10 shadow-lg shadow-black/20">
-                <Search className="text-zinc-500" size={20} />
+            <div className="flex items-center gap-3 bg-card p-4 rounded-full border border-border sticky top-4 z-10 shadow-lg shadow-black/20">
+                <Search className="text-muted-foreground" size={20} />
                 <input
                     placeholder="Search loans..."
-                    className="bg-transparent flex-1 outline-none text-sm text-white placeholder:text-zinc-600"
+                    className="bg-transparent flex-1 outline-none text-sm text-foreground placeholder:text-muted-foreground/50"
                     value={search}
                     onChange={e => setSearch(e.target.value)}
                 />
@@ -56,8 +56,8 @@ export default function LoansPage() {
                         className={cn(
                             "px-5 py-2.5 rounded-full text-xs font-medium whitespace-nowrap capitalize transition-all",
                             filter === f
-                                ? "bg-neon-lime text-black font-bold shadow-[0_0_15px_rgba(223,255,79,0.2)]"
-                                : "bg-[#1C1C1E] border border-white/5 text-zinc-400 hover:text-white hover:bg-white/5"
+                                ? "bg-primary text-primary-foreground font-bold shadow-[0_0_15px_rgba(124,58,237,0.3)]"
+                                : "bg-card border border-border text-muted-foreground hover:text-foreground hover:bg-accent"
                         )}
                     >
                         {f} Loans
@@ -71,16 +71,16 @@ export default function LoansPage() {
                 <div className="space-y-4">
                     {filteredLoans.map(loan => (
                         <Link href={`/loans/${loan.id}`} key={loan.id} className="block group">
-                            <div className="p-5 rounded-[24px] bg-[#1C1C1E] border border-white/5 relative overflow-hidden transition-all hover:bg-[#252527] hover:border-white/10 group-active:scale-[0.98]">
-                                {/* Accent bar - Neon Lime for all */}
-                                <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-neon-lime" />
+                            <div className="p-5 rounded-[32px] bg-card border border-border relative overflow-hidden transition-all hover:bg-accent/40 group-active:scale-[0.98]">
+                                {/* Accent bar */}
+                                <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-primary" />
                                 <div className="flex justify-between items-start mb-3 pl-3">
                                     <div>
-                                        <h3 className="font-bold text-white text-lg tracking-wide">{loan.title}</h3>
-                                        <p className="text-xs text-zinc-500 font-medium mt-0.5">Due: {formatDate(loan.next_due_date || loan.due_date)}</p>
+                                        <h3 className="font-bold text-foreground text-lg tracking-wide">{loan.title}</h3>
+                                        <p className="text-xs text-muted-foreground font-medium mt-0.5">Due: {formatDate(loan.next_due_date || loan.due_date)}</p>
                                     </div>
                                     <div className="text-right">
-                                        <span className="text-xl font-bold text-white tracking-tight">
+                                        <span className="text-xl font-bold text-foreground tracking-tight">
                                             {formatCurrency(loan.outstanding_amount)}
                                         </span>
                                     </div>
@@ -88,12 +88,12 @@ export default function LoansPage() {
                                 <div className="flex justify-between items-center pl-3">
                                     <span className={cn(
                                         "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider",
-                                        loan.status === 'active' ? "bg-neon-purple/10 text-neon-purple border border-neon-purple/20" : "bg-zinc-800 text-zinc-400 border border-zinc-700"
+                                        loan.status === 'active' ? "bg-primary/10 text-primary border border-primary/20" : "bg-muted text-muted-foreground border border-border"
                                     )}>
                                         {loan.status}
                                     </span>
-                                    <span className="text-xs text-zinc-500 font-medium">
-                                        EMI: <span className="text-zinc-300">{formatCurrency(loan.emi_amount)}</span>
+                                    <span className="text-xs text-muted-foreground font-medium">
+                                        EMI: <span className="text-foreground/80">{formatCurrency(loan.emi_amount)}</span>
                                     </span>
                                 </div>
                             </div>
