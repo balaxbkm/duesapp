@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from 'react';
-import { useAuth } from '@/providers/AuthProvider';
+import { useAuth } from '@/providers/AuthContext';
 import { getDashboardStats, makePayment } from '@/services/loanService';
 import { Loan } from '@/types';
 import { Loader2, TrendingUp, ChevronDown, CheckCircle2, Wallet, Plus, Bell, Grid, PieChart, X } from 'lucide-react';
@@ -110,35 +110,35 @@ export default function Dashboard() {
     const progressPercent = Math.min((totalPaidSoFar / totalGoal) * 100, 100);
 
     return (
-        <div className="min-h-screen bg-background pb-32 px-5 pt-6 font-sans overflow-x-hidden selection:bg-neon-lime/30 transition-colors duration-300">
+        <div className="min-h-screen bg-background pb-32 px-5 pt-4 font-sans overflow-x-hidden selection:bg-neon-lime/30 transition-colors duration-300">
 
             {/* Header */}
-            <div className="flex items-center justify-between mb-6 relative z-50">
+            <div className="flex items-center justify-between mb-5 relative z-50">
                 <h1 className="text-lg font-medium text-foreground tracking-wide flex items-center gap-2">
                     <div className="relative w-6 h-6">
                         <Image src="/wallet-3d.png" alt="App Icon" fill className="object-contain" />
                     </div>
-                    DuesApp
+                    <span className="font-bold mt-0.5">DuesApp</span>
                 </h1>
                 <div className="relative">
-                    <div className="flex items-center gap-3">
-                        <div className="h-10 px-6 rounded-full bg-primary/10 text-primary text-xs font-bold tracking-wider min-w-[4rem] flex items-center justify-center uppercase">
+                    <div className="flex items-center gap-2">
+                        <div className="h-8 px-4 rounded-full bg-primary/10 text-primary text-[10px] font-bold tracking-wider min-w-[3.5rem] flex items-center justify-center uppercase">
                             {filter}
                         </div>
                         <button
                             onClick={() => setShowFilterMenu(!showFilterMenu)}
                             className={cn(
-                                "w-10 h-10 rounded-full bg-foreground text-background flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-lg",
+                                "w-8 h-8 rounded-full bg-foreground text-background flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-lg",
                                 showFilterMenu ? "rotate-180" : ""
                             )}
                         >
-                            <ChevronDown size={18} strokeWidth={3} />
+                            <ChevronDown size={14} strokeWidth={3} />
                         </button>
                     </div>
 
                     {/* Creative Glass Dropdown */}
                     <div className={cn(
-                        "absolute top-full right-0 mt-3 w-40 p-1.5 rounded-2xl bg-popover/95 backdrop-blur-xl border border-border shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] flex flex-col gap-1 transition-all duration-300 origin-top-right z-50",
+                        "absolute top-full right-0 mt-2.5 w-32 p-1 rounded-xl bg-popover/95 backdrop-blur-xl border border-border shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] flex flex-col gap-1 transition-all duration-300 origin-top-right z-50",
                         showFilterMenu ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
                     )}>
                         {['All', 'Active', 'Completed'].map((f) => (
@@ -149,7 +149,7 @@ export default function Dashboard() {
                                     setShowFilterMenu(false);
                                 }}
                                 className={cn(
-                                    "px-4 py-2.5 rounded-xl text-left text-xs font-medium transition-all duration-200 flex items-center justify-between group",
+                                    "px-3 py-2 rounded-lg text-left text-[10px] font-medium transition-all duration-200 flex items-center justify-between group",
                                     filter === f
                                         ? "bg-primary text-primary-foreground font-bold shadow-sm"
                                         : "text-muted-foreground hover:bg-accent hover:text-foreground"
@@ -165,7 +165,7 @@ export default function Dashboard() {
 
             {/* Hero Stats */}
             <div className="mb-10 relative">
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center justify-between mt-14 mb-6">
                     <h2 className="text-4xl font-bold text-foreground tracking-tighter">{formatCurrency(stats?.totalToPay || 0)}</h2>
                     <Link href="/add" className="w-10 h-10 flex items-center justify-center btn-neon">
                         <Plus size={20} strokeWidth={2.5} />
@@ -193,18 +193,23 @@ export default function Dashboard() {
                     filteredLoans.map((loan) => (
                         <div key={loan.id} className="group relative">
                             {/* Main Card Link */}
-                            <Link href={`/loans/${loan.id}`} className="absolute inset-0 z-0 rounded-[32px] ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" />
+                            <Link href={`/loans/${loan.id}`} className="absolute inset-0 z-0 rounded-[24px] ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" />
 
-                            <div className="dark-card p-5 relative overflow-hidden bg-card group-hover:bg-accent/40 transition-all border border-border rounded-[32px] pointer-events-none">
+                            <div className="dark-card p-4 relative overflow-hidden bg-card group-hover:bg-accent/40 transition-all border border-border rounded-[24px] pointer-events-none">
+                                {/* Action Button - Higher Z-Index and interactive */}
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault(); // Prevent Link navigation
+                                        handleOpenPaymentModal(loan);
+                                    }}
+                                    className="btn-neon text-[10px] w-24 px-0 py-2.5 absolute top-5 right-5 pointer-events-auto z-10 hover:scale-105 active:scale-95 transition-transform flex items-center justify-center"
+                                >
+                                    {formatCurrency(loan.emi_amount || loan.outstanding_amount)}
+                                </button>
 
-                                {/* Status Label */}
-                                <div className="absolute top-6 right-6 text-neon-purple text-xs font-semibold tracking-wide">
-                                    {loan.status === 'active' ? 'Active' : 'Completed'}
-                                </div>
-
-                                <div className="flex items-start gap-4 mb-8">
+                                <div className="flex items-start gap-4">
                                     {/* Icon with Ring */}
-                                    <div className="relative w-12 h-12 flex items-center justify-center">
+                                    <div className="relative w-10 h-10 flex items-center justify-center">
                                         <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 36 36">
                                             <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" className="stroke-muted" strokeWidth="2" />
                                             <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="hsl(var(--neon-lime))" strokeWidth="2" strokeDasharray="60, 100" />
@@ -218,22 +223,6 @@ export default function Dashboard() {
                                         <h3 className="text-base font-bold text-foreground tracking-wide">{loan.title}</h3>
                                         <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">Due by {formatDate(loan.next_due_date || loan.due_date)}</p>
                                     </div>
-                                </div>
-
-                                <div className="flex items-end justify-between">
-                                    <div>
-                                        <p className="text-xs text-muted-foreground mb-0.5 font-medium">Left: <span className="text-foreground text-lg font-bold ml-1 tracking-tight">{formatCurrency(loan.outstanding_amount)}</span></p>
-                                    </div>
-                                    {/* Action Button - Higher Z-Index and interactive */}
-                                    <button
-                                        onClick={(e) => {
-                                            e.preventDefault(); // Prevent Link navigation
-                                            handleOpenPaymentModal(loan);
-                                        }}
-                                        className="btn-neon text-[10px] px-5 py-2.5 pointer-events-auto relative z-10 hover:scale-105 active:scale-95 transition-transform"
-                                    >
-                                        Pay Now
-                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -272,7 +261,7 @@ export default function Dashboard() {
             {/* Payment Modal */}
             {paymentModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="bg-card w-full max-w-sm rounded-[32px] p-6 shadow-2xl border border-border/50 relative scale-in-95 animate-in zoom-in-95 duration-200">
+                    <div className="bg-card w-full max-w-sm rounded-[24px] p-5 shadow-2xl border border-border/50 relative scale-in-95 animate-in zoom-in-95 duration-200">
                         <button
                             onClick={() => setPaymentModalOpen(false)}
                             className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-accent text-muted-foreground hover:text-foreground hover:bg-accent/80 transition-colors"
@@ -280,16 +269,16 @@ export default function Dashboard() {
                             <X size={16} />
                         </button>
 
-                        <div className="flex flex-col items-center mb-6">
-                            <div className="w-14 h-14 rounded-full bg-neon-purple/10 flex items-center justify-center text-neon-purple mb-4">
-                                <Wallet size={28} />
+                        <div className="flex flex-col items-center mb-5">
+                            <div className="w-12 h-12 rounded-full bg-neon-purple/10 flex items-center justify-center text-neon-purple mb-3">
+                                <Wallet size={24} />
                             </div>
-                            <h2 className="text-xl font-bold text-foreground">Make Payment</h2>
-                            <p className="text-sm text-muted-foreground">{selectedLoan?.title}</p>
+                            <h2 className="text-lg font-bold text-foreground">Make Payment</h2>
+                            <p className="text-xs text-muted-foreground">{selectedLoan?.title}</p>
                         </div>
 
-                        <div className="mb-6">
-                            <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1 mb-2 block">Amount</label>
+                        <div className="mb-5">
+                            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider ml-1 mb-1.5 block">Amount</label>
                             <div className="relative">
                                 <div className="absolute left-6 top-1/2 -translate-y-1/2 text-2xl font-bold text-muted-foreground">
                                     {/* Try to reuse symbol logic broadly or default */}
@@ -304,7 +293,7 @@ export default function Dashboard() {
                                 </div>
                                 <input
                                     type="number"
-                                    className="w-full bg-accent/50 border border-border/50 rounded-[20px] py-4 pl-12 pr-4 text-center text-3xl font-bold text-foreground focus:outline-none focus:border-neon-purple/50 focus:ring-4 focus:ring-neon-purple/10 transition-all placeholder:text-muted-foreground/20"
+                                    className="w-full bg-accent/50 border border-border/50 rounded-[16px] py-3 pl-12 pr-4 text-center text-2xl font-bold text-foreground focus:outline-none focus:border-neon-purple/50 focus:ring-4 focus:ring-neon-purple/10 transition-all placeholder:text-muted-foreground/20"
                                     placeholder="0"
                                     value={payAmount}
                                     onChange={(e) => setPayAmount(e.target.value)}
@@ -315,7 +304,7 @@ export default function Dashboard() {
 
                         <button
                             onClick={handleProcessPayment}
-                            className="w-full py-4 rounded-2xl bg-neon-purple text-white font-bold text-lg hover:brightness-110 active:scale-95 transition-all shadow-[0_8px_20px_-4px_rgba(124,58,237,0.5)]"
+                            className="w-full py-3 rounded-xl bg-neon-purple text-white font-bold text-base hover:brightness-110 active:scale-95 transition-all shadow-[0_8px_20px_-4px_rgba(124,58,237,0.5)]"
                         >
                             Confirm Payment
                         </button>

@@ -71,11 +71,11 @@ export default function SettingsPage() {
     const SettingItem = ({ icon: Icon, title, subtitle, type = 'toggle', value, onClick }: any) => (
         <div
             onClick={type === 'link' || type === 'modal' ? onClick : undefined}
-            className={`flex items-center justify-between p-4 bg-card border border-border rounded-2xl mb-3 ${type !== 'toggle' ? 'active:scale-[0.98] cursor-pointer hover:bg-accent/50' : ''} transition-all`}
+            className={`flex items-center justify-between pl-2.5 pr-4 py-3 bg-card border border-border rounded-[18px] mb-2 ${type !== 'toggle' ? 'active:scale-[0.98] cursor-pointer hover:bg-accent/50' : ''} transition-all`}
         >
             <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center text-muted-foreground">
-                    <Icon size={20} />
+                <div className="w-9 h-9 rounded-xl bg-accent flex items-center justify-center text-muted-foreground shrink-0">
+                    <Icon size={18} />
                 </div>
                 <div>
                     <h3 className="text-foreground font-medium text-sm">{title}</h3>
@@ -97,7 +97,7 @@ export default function SettingsPage() {
     );
 
     return (
-        <div className="min-h-screen bg-background pb-32 px-6 pt-8 font-sans selection:bg-neon-lime/30 relative transition-colors duration-300">
+        <div className="min-h-screen bg-background pb-32 px-5 pt-4 font-sans selection:bg-neon-lime/30 relative transition-colors duration-300">
 
             {/* Toast */}
             {toastMessage && (
@@ -107,15 +107,13 @@ export default function SettingsPage() {
             )}
 
             {/* Creative Header */}
-            <div className="flex items-center justify-between mb-8 pt-4">
-                <Link href="/profile" className="w-12 h-12 rounded-full border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-all active:scale-95 group">
-                    <ArrowLeft size={20} className="group-hover:-translate-x-0.5 transition-transform" />
+            <div className="flex items-center gap-4 mb-6 pt-0 px-0">
+                <Link href="/profile" className="w-9 h-9 rounded-full border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-all active:scale-95 group">
+                    <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
                 </Link>
-            </div>
-
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-foreground tracking-tight mb-2">App Settings</h1>
-                <p className="text-muted-foreground text-sm">Manage your preferences and security.</p>
+                <div>
+                    <h1 className="text-xl font-bold text-foreground tracking-tight">App Settings</h1>
+                </div>
             </div>
 
             <div className="space-y-6">

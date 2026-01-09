@@ -26,18 +26,15 @@ export default function SupportPage() {
     }
 
     return (
-        <div className="min-h-screen bg-background pb-32 px-6 pt-8 font-sans selection:bg-neon-lime/30 transition-colors duration-300">
-            {/* Header */}
+        <div className="min-h-screen bg-background pb-32 px-5 pt-4 font-sans selection:bg-neon-lime/30 transition-colors duration-300">
             {/* Creative Header */}
-            <div className="flex items-center justify-between mb-8 pt-4">
-                <Link href="/profile" className="w-12 h-12 rounded-full border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-all active:scale-95 group">
-                    <ArrowLeft size={20} className="group-hover:-translate-x-0.5 transition-transform" />
+            <div className="flex items-center gap-4 mb-6 pt-0 px-0">
+                <Link href="/profile" className="w-9 h-9 rounded-full border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-all active:scale-95 group">
+                    <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
                 </Link>
-            </div>
-
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-foreground tracking-tight mb-2">Help & Support</h1>
-                <p className="text-muted-foreground text-sm">We are here to help you.</p>
+                <div>
+                    <h1 className="text-xl font-bold text-foreground tracking-tight">Help & Support</h1>
+                </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4 mb-8">

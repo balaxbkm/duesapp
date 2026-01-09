@@ -1,6 +1,6 @@
 "use client";
 import { useEffect } from 'react';
-import { useAuth } from '@/providers/AuthProvider';
+import { useAuth } from '@/providers/AuthContext';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -20,20 +20,20 @@ export default function ProfilePage() {
     if (loading || !user) return null;
 
     return (
-        <div className="px-5 pt-3 bg-background min-h-screen pb-32 font-sans selection:bg-neon-lime/30 transition-colors duration-300">
+        <div className="px-5 pt-4 bg-background min-h-screen pb-32 font-sans selection:bg-neon-lime/30 transition-colors duration-300">
             {/* Creative Header */}
-            <div className="flex items-center justify-between mb-4 pt-3 px-4">
-                <Link href="/dashboard" className="w-12 h-12 rounded-full border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-all active:scale-95 group">
-                    <ArrowLeft size={20} className="group-hover:-translate-x-0.5 transition-transform" />
+            <div className="flex items-center justify-between mb-6 pt-0 px-0">
+                <div className="flex items-center gap-4">
+                    <Link href="/dashboard" className="w-9 h-9 rounded-full border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-all active:scale-95 group">
+                        <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
+                    </Link>
+                    <div>
+                        <h1 className="text-xl font-bold text-foreground tracking-tighter">My Account</h1>
+                    </div>
+                </div>
+                <Link href="/settings" className="w-9 h-9 rounded-full border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-all active:scale-95 group">
+                    <Settings size={16} className="group-hover:rotate-90 transition-transform duration-500" />
                 </Link>
-                <Link href="/settings" className="w-12 h-12 rounded-full border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-all active:scale-95 group">
-                    <Settings size={20} className="group-hover:rotate-90 transition-transform duration-500" />
-                </Link>
-            </div>
-
-            <div className="mb-6">
-                <h1 className="text-3xl font-bold text-foreground tracking-tighter mb-1">My Account</h1>
-                <p className="text-muted-foreground text-xs">Manage your profile and settings.</p>
             </div>
 
             {/* Profile Card */}
@@ -57,11 +57,11 @@ export default function ProfilePage() {
             </div>
 
             {/* Menu Options */}
-            <div className="space-y-4">
-                <Link href="/profile/edit" className="flex items-center justify-between p-5 bg-card rounded-[24px] border border-border hover:bg-accent/50 active:scale-[0.98] transition-all group">
+            <div className="space-y-2">
+                <Link href="/profile/edit" className="flex items-center justify-between pl-2.5 pr-4 py-2 bg-card rounded-[18px] border border-border hover:bg-accent/50 active:scale-[0.98] transition-all group">
                     <div className="flex items-center gap-4">
-                        <div className="p-3 bg-accent rounded-2xl text-muted-foreground group-hover:text-foreground group-hover:bg-accent/80 transition-colors">
-                            <User size={20} />
+                        <div className="w-9 h-9 shrink-0 bg-accent rounded-xl text-muted-foreground group-hover:text-foreground group-hover:bg-accent/80 flex items-center justify-center transition-colors">
+                            <User size={18} />
                         </div>
                         <span className="font-medium text-foreground group-hover:text-foreground text-sm">Edit Profile</span>
                     </div>
@@ -70,10 +70,10 @@ export default function ProfilePage() {
                     </div>
                 </Link>
 
-                <Link href="/settings" className="flex items-center justify-between p-4 bg-card rounded-[20px] border border-border hover:bg-accent/50 active:scale-[0.98] transition-all group">
+                <Link href="/settings" className="flex items-center justify-between pl-2.5 pr-4 py-2 bg-card rounded-[18px] border border-border hover:bg-accent/50 active:scale-[0.98] transition-all group">
                     <div className="flex items-center gap-4">
-                        <div className="p-3 bg-accent rounded-2xl text-muted-foreground group-hover:text-foreground group-hover:bg-accent/80 transition-colors">
-                            <Settings size={20} />
+                        <div className="w-9 h-9 shrink-0 bg-accent rounded-xl text-muted-foreground group-hover:text-foreground group-hover:bg-accent/80 flex items-center justify-center transition-colors">
+                            <Settings size={18} />
                         </div>
                         <span className="font-medium text-foreground group-hover:text-foreground text-sm">App Settings</span>
                     </div>
@@ -82,10 +82,10 @@ export default function ProfilePage() {
                     </div>
                 </Link>
 
-                <Link href="/support" className="flex items-center justify-between p-4 bg-card rounded-[20px] border border-border hover:bg-accent/50 active:scale-[0.98] transition-all group">
+                <Link href="/support" className="flex items-center justify-between pl-2.5 pr-4 py-2 bg-card rounded-[18px] border border-border hover:bg-accent/50 active:scale-[0.98] transition-all group">
                     <div className="flex items-center gap-4">
-                        <div className="p-3 bg-accent rounded-2xl text-muted-foreground group-hover:text-foreground group-hover:bg-accent/80 transition-colors">
-                            <Info size={20} />
+                        <div className="w-9 h-9 shrink-0 bg-accent rounded-xl text-muted-foreground group-hover:text-foreground group-hover:bg-accent/80 flex items-center justify-center transition-colors">
+                            <Info size={18} />
                         </div>
                         <span className="font-medium text-foreground group-hover:text-foreground text-sm">Support</span>
                     </div>
@@ -96,10 +96,14 @@ export default function ProfilePage() {
 
                 <button
                     onClick={logout}
-                    className="w-full flex items-center gap-4 p-5 bg-card text-red-500 rounded-[24px] border border-border hover:bg-red-500/10 mt-8 active:scale-[0.98] transition-all group"
+                    className="w-full flex items-center justify-between pl-2.5 pr-4 py-2 bg-card text-red-500 rounded-[18px] border border-border hover:bg-red-500/10 mt-6 active:scale-[0.98] transition-all group"
                 >
-                    <div className="p-3 bg-red-500/10 rounded-2xl group-hover:bg-red-500/20 transition-colors"><LogOut size={20} /></div>
-                    <span className="font-bold text-sm">Sign Out</span>
+                    <div className="flex items-center gap-4">
+                        <div className="w-9 h-9 shrink-0 bg-red-500/10 rounded-xl flex items-center justify-center transition-colors">
+                            <LogOut size={18} />
+                        </div>
+                        <span className="font-bold text-sm">Sign Out</span>
+                    </div>
                 </button>
             </div>
         </div>

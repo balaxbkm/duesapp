@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from 'react';
-import { useAuth } from '@/providers/AuthProvider';
+import { useAuth } from '@/providers/AuthContext';
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts';
 import { ArrowLeft, TrendingUp, DollarSign, Calendar, IndianRupee, Euro, PoundSterling } from 'lucide-react';
 import Link from 'next/link';
@@ -39,36 +39,34 @@ export default function ReportsPage() {
     if (!user) return null;
 
     return (
-        <div className="p-6 bg-background min-h-screen pb-32 font-sans selection:bg-neon-lime/30 transition-colors duration-300">
+        <div className="px-5 pt-4 bg-background min-h-screen pb-32 font-sans selection:bg-neon-lime/30 transition-colors duration-300">
             {/* Creative Header */}
-            <div className="flex items-center justify-between mb-8 pt-4">
-                <Link href="/dashboard" className="w-12 h-12 rounded-full border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-all active:scale-95 group">
-                    <ArrowLeft size={20} className="group-hover:-translate-x-0.5 transition-transform" />
+            <div className="flex items-center gap-4 mb-6 pt-0 px-0">
+                <Link href="/dashboard" className="w-9 h-9 rounded-full border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-all active:scale-95 group">
+                    <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
                 </Link>
-            </div>
-
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-foreground tracking-tight mb-2">Financial Reports</h1>
-                <p className="text-muted-foreground text-sm">Track your payments and pending dues.</p>
+                <div>
+                    <h1 className="text-xl font-bold text-foreground tracking-tight">Financial Reports</h1>
+                </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4 mb-8">
-                <div className="bg-card p-5 rounded-[24px] border border-border">
-                    <div className="md:w-10 md:h-10 w-8 h-8 rounded-full bg-neon-lime/10 flex items-center justify-center text-neon-lime mb-3">
-                        <TrendingUp size={18} />
+                <div className="bg-card p-4 rounded-[18px] border border-border">
+                    <div className="w-8 h-8 rounded-full bg-neon-lime/10 flex items-center justify-center text-neon-lime mb-2">
+                        <TrendingUp size={16} />
                     </div>
-                    <p className="text-xs text-muted-foreground mb-1">Total Paid</p>
-                    <p className="text-xl font-bold text-foreground">{formatCurrency(4200)}</p>
+                    <p className="text-[10px] text-muted-foreground mb-0.5">Total Paid</p>
+                    <p className="text-lg font-bold text-foreground">{formatCurrency(4200)}</p>
                 </div>
-                <div className="bg-card p-5 rounded-[24px] border border-border">
-                    <div className="md:w-10 md:h-10 w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 mb-3">
-                        {currency === 'INR' ? <IndianRupee size={18} /> :
-                            currency === 'EUR' ? <Euro size={18} /> :
-                                currency === 'GBP' ? <PoundSterling size={18} /> :
-                                    <DollarSign size={18} />}
+                <div className="bg-card p-4 rounded-[18px] border border-border">
+                    <div className="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 mb-2">
+                        {currency === 'INR' ? <IndianRupee size={16} /> :
+                            currency === 'EUR' ? <Euro size={16} /> :
+                                currency === 'GBP' ? <PoundSterling size={16} /> :
+                                    <DollarSign size={16} />}
                     </div>
-                    <p className="text-xs text-muted-foreground mb-1">Pending</p>
-                    <p className="text-xl font-bold text-foreground">{formatCurrency(12800)}</p>
+                    <p className="text-[10px] text-muted-foreground mb-0.5">Pending</p>
+                    <p className="text-lg font-bold text-foreground">{formatCurrency(12800)}</p>
                 </div>
             </div>
 
@@ -79,7 +77,7 @@ export default function ReportsPage() {
                 </h2>
                 <div className="h-[250px] w-full *:focus:outline-none focus:outline-none [&_.recharts-wrapper]:!outline-none [&_.recharts-surface]:!outline-none" style={{ outline: 'none' }}>
                     <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={data} margin={{ top: 20, right: 0, left: -20, bottom: 0 }}>
+                        <BarChart data={data} margin={{ top: 20, right: 0, left: -24, bottom: 0 }}>
                             <defs>
                                 <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
                                     <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={1} />
@@ -100,7 +98,8 @@ export default function ReportsPage() {
                                 tickLine={false}
                                 axisLine={false}
                                 tickFormatter={(value) => formatCurrency(value)}
-                                dx={-10}
+                                dx={-4}
+                                width={60}
                             />
                             <Tooltip
                                 trigger="click"

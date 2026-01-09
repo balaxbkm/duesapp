@@ -141,6 +141,15 @@
     @apply bg-background/50 backdrop-blur-xl rounded-full px-6 py-4 flex items-center justify-around border border-border/50;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
   }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 @layer base {

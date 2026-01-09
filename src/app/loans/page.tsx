@@ -1,9 +1,9 @@
 "use client";
 import { useEffect, useState } from 'react';
-import { useAuth } from '@/providers/AuthProvider';
+import { useAuth } from '@/providers/AuthContext';
 import { getUserLoans } from '@/services/loanService';
 import { Loan } from '@/types';
-import { Loader2, Search, Filter } from 'lucide-react';
+import { Loader2, Search, Filter, ArrowLeft } from 'lucide-react';
 import { formatCurrency, formatDate, cn } from '@/lib/utils';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -35,8 +35,16 @@ export default function LoansPage() {
     });
 
     return (
-        <div className="p-6 pb-32 space-y-6 min-h-screen bg-background font-sans selection:bg-primary/30">
-            <h1 className="text-xl font-medium text-foreground tracking-wide mb-4">All Loans</h1>
+        <div className="px-5 pt-4 pb-32 space-y-6 min-h-screen bg-background font-sans selection:bg-primary/30">
+            {/* Header */}
+            <div className="flex items-center gap-4 mb-0 pt-0 px-0">
+                <Link href="/dashboard" className="w-9 h-9 rounded-full border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-all active:scale-95 group">
+                    <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
+                </Link>
+                <div>
+                    <h1 className="text-xl font-bold text-foreground tracking-tight">All Loans</h1>
+                </div>
+            </div>
 
             <div className="flex items-center gap-3 bg-card p-4 rounded-full border border-border sticky top-4 z-10 shadow-lg shadow-black/20">
                 <Search className="text-muted-foreground" size={20} />

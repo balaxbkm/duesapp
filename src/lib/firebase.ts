@@ -3,6 +3,7 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getFunctions } from "firebase/functions";
 import { getMessaging } from "firebase/messaging";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
     apiKey: "AIzaSyB9lWKBPYZZvm2cCmN_kRcpvCh_o1IFnIo",
@@ -19,6 +20,7 @@ const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
 const db = getFirestore(app);
 const functions = getFunctions(app);
+const storage = getStorage(app);
 
 // Messaging is only supported in window environment
 let messaging = null;
@@ -28,4 +30,4 @@ if (typeof window !== "undefined") {
     // Initializing it conditionally to prevent SSR errors.
 }
 
-export { app, auth, db, functions, messaging };
+export { app, auth, db, functions, messaging, storage };

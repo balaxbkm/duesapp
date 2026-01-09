@@ -1,5 +1,5 @@
 "use client";
-import { useAuth } from '@/providers/AuthProvider';
+import { useAuth } from '@/providers/AuthContext';
 import { ArrowLeft, Bell, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -84,35 +84,33 @@ export default function NotificationsPage() {
     const unreadCount = notifications.filter(n => !n.read).length;
 
     return (
-        <div className="p-6 bg-background min-h-screen pb-32 font-sans selection:bg-neon-lime/30 transition-colors duration-300">
+        <div className="px-5 pt-4 bg-background min-h-screen pb-32 font-sans selection:bg-neon-lime/30 transition-colors duration-300">
             {/* Creative Header */}
-            <div className="flex items-center justify-between mb-8 pt-4">
-                <Link href="/dashboard" className="w-12 h-12 rounded-full border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-all active:scale-95 group">
-                    <ArrowLeft size={20} className="group-hover:-translate-x-0.5 transition-transform" />
-                </Link>
+            <div className="flex items-center justify-between mb-6 pt-0 px-0">
+                <div className="flex items-center gap-4">
+                    <Link href="/dashboard" className="w-9 h-9 rounded-full border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-all active:scale-95 group">
+                        <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
+                    </Link>
+                    <div>
+                        <h1 className="text-xl font-bold text-foreground tracking-tighter">Notifications</h1>
+                    </div>
+                </div>
                 <div className="flex gap-4 items-center">
                     {unreadCount > 0 && (
                         <button
                             onClick={handleMarkAllRead}
-                            className="text-xs font-bold text-primary hover:opacity-80 transition-opacity uppercase tracking-wider"
+                            className="text-[10px] font-bold text-primary hover:opacity-80 transition-opacity uppercase tracking-wider"
                         >
                             Mark all read
                         </button>
                     )}
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary border border-primary/20 relative">
-                        <Bell size={18} />
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary border border-primary/20 relative">
+                        <Bell size={14} />
                         {unreadCount > 0 && (
-                            <div className="absolute top-2 right-2.5 w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_hsl(var(--primary))] animate-pulse"></div>
+                            <div className="absolute top-1.5 right-2 w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_hsl(var(--primary))] animate-pulse"></div>
                         )}
                     </div>
                 </div>
-            </div>
-
-            <div className="mb-8">
-                <h1 className="text-4xl font-bold text-foreground tracking-tighter mb-2">Notifications</h1>
-                <p className="text-muted-foreground text-sm">
-                    You have <span className="text-foreground font-bold">{unreadCount > 0 ? `${unreadCount} unread` : 'no new'}</span> updates today.
-                </p>
             </div>
 
             <div className="space-y-4">
@@ -121,7 +119,7 @@ export default function NotificationsPage() {
                         key={notif.id}
                         onClick={() => !notif.read && notif.id && handleRead(notif.id)}
                         className={cn(
-                            "p-5 rounded-[24px] border border-border relative overflow-hidden transition-all hover:bg-accent/40 cursor-pointer",
+                            "pl-2.5 pr-4 py-3 rounded-[18px] border border-border relative overflow-hidden transition-all hover:bg-accent/40 cursor-pointer",
                             notif.read ? "bg-card opacity-60" : "bg-card shadow-lg shadow-black/5 border-l-4 border-l-primary"
                         )}
                     >
@@ -132,7 +130,7 @@ export default function NotificationsPage() {
 
                         <div className="flex gap-4">
                             <div className={cn(
-                                "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0",
+                                "w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0",
                                 notif.type === 'warning' ? 'bg-orange-500/10 text-orange-500' :
                                     notif.type === 'success' ? 'bg-green-500/10 text-green-500' :
                                         'bg-blue-500/10 text-blue-500'

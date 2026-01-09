@@ -1,7 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/providers/AuthProvider";
+import { useAuth } from "@/providers/AuthContext";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button"; // Need to create button
 import Image from "next/image";

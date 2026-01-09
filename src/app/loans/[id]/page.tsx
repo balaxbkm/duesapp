@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { useAuth } from '@/providers/AuthProvider';
+import { useAuth } from '@/providers/AuthContext';
 import { doc, getDoc, collection, query, where, orderBy, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Loan, Payment } from '@/types';
@@ -104,19 +104,23 @@ export default function LoanDetailsPage() {
     ];
 
     return (
-        <div className="bg-background min-h-screen text-foreground font-sans flex flex-col transition-colors duration-300">
+        <div className="bg-background min-h-screen text-foreground font-sans flex flex-col transition-colors duration-300 px-5 pt-4">
             {/* Header */}
-            <div className="flex items-center justify-between p-6 pt-8">
-                <Link href="/dashboard" className="w-12 h-12 rounded-full border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-all active:scale-95">
-                    <ArrowLeft size={20} />
-                </Link>
-                <h1 className="font-bold text-xl text-foreground tracking-tight">Loan Detail</h1>
-                <button className="w-12 h-12 rounded-full border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-destructive hover:border-destructive/30 transition-all active:scale-95">
-                    <Trash2 size={20} />
+            <div className="flex items-center justify-between mb-6 pt-0 px-0">
+                <div className="flex items-center gap-4">
+                    <Link href="/dashboard" className="w-9 h-9 rounded-full border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-all active:scale-95 group">
+                        <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
+                    </Link>
+                    <div>
+                        <h1 className="text-xl font-bold text-foreground tracking-tight">Loan Detail</h1>
+                    </div>
+                </div>
+                <button className="w-9 h-9 rounded-full border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-destructive hover:border-destructive/30 transition-all active:scale-95 group">
+                    <Trash2 size={16} />
                 </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-6 pb-32">
+            <div className="flex-1 overflow-y-auto pb-32">
 
                 {/* Main Info Card */}
                 <div className="bg-card p-6 mb-6 relative overflow-hidden border border-border/50 shadow-xl rounded-[40px]">
