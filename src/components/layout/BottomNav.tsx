@@ -17,8 +17,8 @@ export function BottomNav() {
     if (pathname === '/' || pathname === '/login' || pathname.startsWith('/loans/') || pathname === '/add' || pathname === '/profile/edit' || pathname === '/settings' || pathname === '/support') return null;
 
     return (
-        <div className="fixed bottom-8 left-0 right-0 z-50 flex justify-center pointer-events-none">
-            <div className="nav-pill pointer-events-auto h-[72px] px-2 flex items-center gap-1 overflow-hidden relative">
+        <div className="fixed bottom-6 left-0 right-0 z-50 flex justify-center pointer-events-none">
+            <div className="nav-pill pointer-events-auto h-[60px] px-1.5 flex items-center gap-0.5 overflow-hidden relative">
                 {navItems.map((item) => {
                     // Force Loans to be active for the demo if in dashboard, or use logic
                     const isActive = pathname === item.href || (item.name === 'Loans' && pathname === '/dashboard');
@@ -29,13 +29,13 @@ export function BottomNav() {
                             key={item.name}
                             href={item.href}
                             className={cn(
-                                "relative w-14 h-14 flex items-center justify-center rounded-full transition-all duration-300",
+                                "relative w-11 h-11 flex items-center justify-center rounded-full transition-all duration-300",
                                 isActive
-                                    ? "bg-primary text-primary-foreground shadow-[0_0_15px_hsl(var(--primary)/0.4)]"
+                                    ? "bg-primary text-primary-foreground shadow-[0_0_12px_hsl(var(--primary)/0.4)]"
                                     : "text-muted-foreground hover:text-foreground hover:bg-accent"
                             )}
                         >
-                            <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
+                            <Icon size={18} strokeWidth={isActive ? 2.5 : 2} />
                         </Link>
                     )
                 })}

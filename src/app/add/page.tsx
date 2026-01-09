@@ -63,18 +63,18 @@ export default function AddLoanPage() {
     return (
         <div className="min-h-screen bg-background pb-24 font-sans selection:bg-neon-lime/30 transition-colors duration-300">
             {/* Creative Header */}
-            <div className="flex items-center justify-between mb-8 pt-6 px-4">
+            <div className="flex items-center justify-between mb-4 pt-2 px-4">
                 <Link href="/dashboard" className="w-12 h-12 rounded-full border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-all active:scale-95 group">
                     <ArrowLeft size={20} className="group-hover:-translate-x-0.5 transition-transform" />
                 </Link>
             </div>
 
-            <div className="mb-8 px-4">
-                <h1 className="text-3xl font-bold text-foreground tracking-tight mb-2">Add New Loan</h1>
-                <p className="text-muted-foreground text-sm">Enter the details of the loan you owe.</p>
+            <div className="mb-6 px-4">
+                <h1 className="text-2xl font-bold text-foreground tracking-tight mb-1">Add New Loan</h1>
+                <p className="text-muted-foreground text-xs">Enter the details of the loan you owe.</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-6 max-w-lg mx-auto">
+            <form onSubmit={handleSubmit} className="p-4 space-y-5 max-w-lg mx-auto">
 
 
                 {/* Inputs */}
@@ -89,7 +89,7 @@ export default function AddLoanPage() {
                                 placeholder="Lender Name (e.g. HDFC, John)"
                                 value={formData.title}
                                 onChange={e => setFormData({ ...formData, title: e.target.value })}
-                                className="w-full pl-12 pr-4 py-4 rounded-2xl bg-card border border-border text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-neon-lime/50 focus:ring-1 focus:ring-neon-lime/50 font-medium transition-all"
+                                className="w-full pl-12 pr-4 py-3 rounded-xl bg-card border border-border text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-neon-lime/50 focus:ring-1 focus:ring-neon-lime/50 font-medium transition-all"
                             />
                         </div>
                     </div>
@@ -113,7 +113,7 @@ export default function AddLoanPage() {
                                     placeholder="0.00"
                                     value={formData.principal_amount}
                                     onChange={e => setFormData({ ...formData, principal_amount: e.target.value })}
-                                    className="w-full pl-10 pr-4 py-4 rounded-2xl bg-card border border-border text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-neon-lime/50 focus:ring-1 focus:ring-neon-lime/50 font-medium transition-all"
+                                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-card border border-border text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-neon-lime/50 focus:ring-1 focus:ring-neon-lime/50 font-medium transition-all"
                                 />
                             </div>
                         </div>
@@ -134,7 +134,7 @@ export default function AddLoanPage() {
                                     placeholder="Optional"
                                     value={formData.emi_amount}
                                     onChange={e => setFormData({ ...formData, emi_amount: e.target.value })}
-                                    className="w-full pl-10 pr-4 py-4 rounded-2xl bg-card border border-border text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-neon-lime/50 focus:ring-1 focus:ring-neon-lime/50 font-medium transition-all"
+                                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-card border border-border text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-neon-lime/50 focus:ring-1 focus:ring-neon-lime/50 font-medium transition-all"
                                 />
                             </div>
                         </div>
@@ -147,7 +147,7 @@ export default function AddLoanPage() {
                             <select
                                 value={formData.frequency}
                                 onChange={e => setFormData({ ...formData, frequency: e.target.value as PaymentFrequency })}
-                                className="w-full pl-12 pr-4 py-4 rounded-2xl bg-card border border-border text-foreground focus:outline-none focus:border-neon-lime/50 focus:ring-1 focus:ring-neon-lime/50 font-medium appearance-none transition-all"
+                                className="w-full pl-12 pr-4 py-3 rounded-xl bg-card border border-border text-foreground focus:outline-none focus:border-neon-lime/50 focus:ring-1 focus:ring-neon-lime/50 font-medium appearance-none transition-all"
                             >
                                 <option value="monthly">Monthly</option>
                                 <option value="weekly">Weekly</option>
@@ -165,7 +165,7 @@ export default function AddLoanPage() {
                                     type="date"
                                     value={formData.start_date}
                                     onChange={e => setFormData({ ...formData, start_date: e.target.value })}
-                                    className="w-full px-4 py-4 rounded-2xl bg-card border border-border text-foreground focus:outline-none focus:border-neon-lime/50 focus:ring-1 focus:ring-neon-lime/50 font-medium text-sm transition-all"
+                                    className="w-full px-4 py-3 rounded-xl bg-card border border-border text-foreground focus:outline-none focus:border-neon-lime/50 focus:ring-1 focus:ring-neon-lime/50 font-medium text-sm transition-all"
                                 />
                             </div>
                         </div>
@@ -177,7 +177,7 @@ export default function AddLoanPage() {
                                     type="date"
                                     value={formData.due_date}
                                     onChange={e => setFormData({ ...formData, due_date: e.target.value })}
-                                    className="w-full px-4 py-4 rounded-2xl bg-card border border-border text-foreground focus:outline-none focus:border-neon-lime/50 focus:ring-1 focus:ring-neon-lime/50 font-medium text-sm transition-all"
+                                    className="w-full px-4 py-3 rounded-xl bg-card border border-border text-foreground focus:outline-none focus:border-neon-lime/50 focus:ring-1 focus:ring-neon-lime/50 font-medium text-sm transition-all"
                                 />
                             </div>
                         </div>
@@ -190,7 +190,7 @@ export default function AddLoanPage() {
                             placeholder="Any usage details..."
                             value={formData.notes}
                             onChange={e => setFormData({ ...formData, notes: e.target.value })}
-                            className="w-full px-4 py-4 rounded-2xl bg-card border border-border text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-neon-lime/50 focus:ring-1 focus:ring-neon-lime/50 font-medium resize-none transition-all"
+                            className="w-full px-4 py-3 rounded-xl bg-card border border-border text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-neon-lime/50 focus:ring-1 focus:ring-neon-lime/50 font-medium resize-none transition-all"
                         />
                     </div>
 
@@ -199,9 +199,9 @@ export default function AddLoanPage() {
                 <button
                     disabled={submitting}
                     type="submit"
-                    className="btn-neon w-full py-4 text-lg flex items-center justify-center gap-2"
+                    className="btn-neon w-full py-3.5 text-base flex items-center justify-center gap-2"
                 >
-                    {submitting ? <Loader2 className="animate-spin" /> : <Check size={20} strokeWidth={3} />}
+                    {submitting ? <Loader2 className="animate-spin" /> : <Check size={18} strokeWidth={3} />}
                     Save Loan
                 </button>
 

@@ -110,12 +110,12 @@ export default function Dashboard() {
     const progressPercent = Math.min((totalPaidSoFar / totalGoal) * 100, 100);
 
     return (
-        <div className="min-h-screen bg-background pb-32 px-6 pt-12 font-sans overflow-x-hidden selection:bg-neon-lime/30 transition-colors duration-300">
+        <div className="min-h-screen bg-background pb-32 px-5 pt-6 font-sans overflow-x-hidden selection:bg-neon-lime/30 transition-colors duration-300">
 
             {/* Header */}
-            <div className="flex items-center justify-between mb-8 relative z-50">
-                <h1 className="text-xl font-medium text-foreground tracking-wide flex items-center gap-3">
-                    <div className="relative w-8 h-8">
+            <div className="flex items-center justify-between mb-6 relative z-50">
+                <h1 className="text-lg font-medium text-foreground tracking-wide flex items-center gap-2">
+                    <div className="relative w-6 h-6">
                         <Image src="/wallet-3d.png" alt="App Icon" fill className="object-contain" />
                     </div>
                     DuesApp
@@ -166,9 +166,9 @@ export default function Dashboard() {
             {/* Hero Stats */}
             <div className="mb-10 relative">
                 <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-5xl font-bold text-foreground tracking-tighter">{formatCurrency(stats?.totalToPay || 0)}</h2>
-                    <Link href="/add" className="w-12 h-12 flex items-center justify-center btn-neon">
-                        <Plus size={24} strokeWidth={2.5} />
+                    <h2 className="text-4xl font-bold text-foreground tracking-tighter">{formatCurrency(stats?.totalToPay || 0)}</h2>
+                    <Link href="/add" className="w-10 h-10 flex items-center justify-center btn-neon">
+                        <Plus size={20} strokeWidth={2.5} />
                     </Link>
                 </div>
 
@@ -215,14 +215,14 @@ export default function Dashboard() {
                                     </div>
 
                                     <div className="mt-1">
-                                        <h3 className="text-lg font-bold text-foreground tracking-wide">{loan.title}</h3>
-                                        <p className="text-[11px] text-muted-foreground mt-1 font-medium">Due by {formatDate(loan.next_due_date || loan.due_date)}</p>
+                                        <h3 className="text-base font-bold text-foreground tracking-wide">{loan.title}</h3>
+                                        <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">Due by {formatDate(loan.next_due_date || loan.due_date)}</p>
                                     </div>
                                 </div>
 
                                 <div className="flex items-end justify-between">
                                     <div>
-                                        <p className="text-xs text-muted-foreground mb-1 font-medium">Left: <span className="text-foreground text-xl font-bold ml-1 tracking-tight">{formatCurrency(loan.outstanding_amount)}</span></p>
+                                        <p className="text-xs text-muted-foreground mb-0.5 font-medium">Left: <span className="text-foreground text-lg font-bold ml-1 tracking-tight">{formatCurrency(loan.outstanding_amount)}</span></p>
                                     </div>
                                     {/* Action Button - Higher Z-Index and interactive */}
                                     <button
@@ -230,7 +230,7 @@ export default function Dashboard() {
                                             e.preventDefault(); // Prevent Link navigation
                                             handleOpenPaymentModal(loan);
                                         }}
-                                        className="btn-neon text-xs px-6 py-3 pointer-events-auto relative z-10 hover:scale-105 active:scale-95 transition-transform"
+                                        className="btn-neon text-[10px] px-5 py-2.5 pointer-events-auto relative z-10 hover:scale-105 active:scale-95 transition-transform"
                                     >
                                         Pay Now
                                     </button>
@@ -243,7 +243,7 @@ export default function Dashboard() {
                         {/* Background Glow */}
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-neon-lime/5 rounded-full blur-3xl pointer-events-none" />
 
-                        <div className="relative w-24 h-24 mb-6">
+                        <div className="relative w-16 h-16 mb-4">
                             {/* Floating 3D Icon */}
                             <Image
                                 src="/wallet-3d.png"

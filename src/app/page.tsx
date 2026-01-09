@@ -12,7 +12,7 @@ function SimpleButton({ onClick, children, className }: { onClick?: () => void, 
   return (
     <button
       onClick={onClick}
-      className={cn("px-6 py-3 rounded-xl font-semibold transition-all active:scale-95", className)}
+      className={cn("px-5 py-2.5 rounded-xl font-semibold transition-all active:scale-95 text-sm", className)}
     >
       {children}
     </button>
@@ -39,9 +39,9 @@ export default function LandingPage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-6 text-center bg-background bg-gradient-to-br from-background via-neon-lime/5 to-neon-purple/5 transition-colors duration-300">
-      <div className="w-full max-w-md space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
-        <div className="space-y-2">
-          <div className="relative w-28 h-28 mx-auto mb-6 group">
+      <div className="w-full max-w-sm space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-700">
+        <div className="space-y-1">
+          <div className="relative w-14 h-14 mx-auto mb-3 group">
             <div className="absolute inset-0 bg-primary/20 rounded-full blur-3xl group-hover:bg-primary/30 transition-colors duration-500 animate-pulse" />
             <div className="relative w-full h-full transform transition-transform hover:scale-110 duration-500">
               <Image
@@ -53,15 +53,15 @@ export default function LandingPage() {
               />
             </div>
           </div>
-          <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl bg-clip-text text-transparent bg-gradient-to-r from-neon-lime to-neon-purple">
+          <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl bg-clip-text text-transparent bg-gradient-to-r from-neon-lime to-neon-purple">
             DuesApp
           </h1>
-          <p className="text-muted-foreground text-lg px-4">
+          <p className="text-muted-foreground text-base px-4">
             Your personal money reminder that never misses a due date.
           </p>
         </div>
 
-        <div className="space-y-4 pt-8">
+        <div className="space-y-3 pt-6">
           <SimpleButton
             onClick={signInWithGoogle}
             className="w-full bg-card border border-border text-foreground hover:bg-accent hover:text-accent-foreground shadow-md flex items-center justify-center gap-3"
@@ -95,16 +95,16 @@ export default function LandingPage() {
           </SimpleButton>
         </div>
 
-        <div className="pt-10 grid grid-cols-2 gap-4 text-left">
-          <div className="p-4 rounded-2xl bg-card/40 backdrop-blur border border-border/50">
-            <div className="text-2xl mb-1">🔔</div>
-            <h3 className="font-semibold text-sm text-foreground">Smart Reminders</h3>
-            <p className="text-xs text-muted-foreground">Never miss a payment again.</p>
+        <div className="pt-6 grid grid-cols-2 gap-3 text-left">
+          <div className="p-3 rounded-xl bg-card/40 backdrop-blur border border-border/50">
+            <div className="text-xl mb-1">🔔</div>
+            <h3 className="font-semibold text-xs text-foreground">Smart Reminders</h3>
+            <p className="text-[10px] text-muted-foreground">Never miss a payment.</p>
           </div>
-          <div className="p-4 rounded-2xl bg-card/40 backdrop-blur border border-border/50">
-            <div className="text-2xl mb-1">📊</div>
-            <h3 className="font-semibold text-sm text-foreground">Track Loans</h3>
-            <p className="text-xs text-muted-foreground">Manage what you owe & receive.</p>
+          <div className="p-3 rounded-xl bg-card/40 backdrop-blur border border-border/50">
+            <div className="text-xl mb-1">📊</div>
+            <h3 className="font-semibold text-xs text-foreground">Track Loans</h3>
+            <p className="text-[10px] text-muted-foreground">Manage what you owe.</p>
           </div>
         </div>
       </div>
