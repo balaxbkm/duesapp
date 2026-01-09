@@ -1,12 +1,12 @@
 "use client";
 import { useAuth } from '@/providers/AuthContext';
-import { ArrowLeft, Bell, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { ArrowLeft, Bell, CheckCircle2, AlertCircle, Loader2, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import { Notification } from '@/types';
-import { getNotifications, markAsRead, markAllAsRead, createNotification } from '@/services/notificationService';
+import { getNotifications, markAsRead, markAllAsRead, createNotification, deleteAllNotifications } from '@/services/notificationService';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function NotificationsPage() {
@@ -78,6 +78,14 @@ export default function NotificationsPage() {
         await markAsRead(id);
     };
 
+    const handleClearAll = async () => {
+        if (!user || notifications.length === 0) return;
+        if (confirm("Are you sure you want to delete all notifications?")) {
+            setNotifications([]);
+            await deleteAllNotifications(user.uid);
+        }
+    };
+
     if (!user) return null;
     if (loading) return <div className="flex justify-center items-center h-screen bg-background"><Loader2 className="animate-spin text-primary" /></div>;
 
@@ -104,6 +112,7 @@ export default function NotificationsPage() {
                             Mark all read
                         </button>
                     )}
+
                     <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary border border-primary/20 relative">
                         <Bell size={14} />
                         {unreadCount > 0 && (
@@ -164,6 +173,18 @@ export default function NotificationsPage() {
                     </div>
                 )}
             </div>
+
+            {notifications.length > 0 && (
+                <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-20">
+                    <button
+                        onClick={handleClearAll}
+                        className="flex items-center gap-2 bg-card/80 backdrop-blur-md border border-red-500/20 text-red-500 px-5 py-2.5 rounded-full shadow-lg hover:bg-red-500/10 transition-all active:scale-95 text-xs font-bold uppercase tracking-wider whitespace-nowrap"
+                    >
+                        <Trash2 size={14} />
+                        Clear All Notifications
+                    </button>
+                </div>
+            )}
         </div>
     );
 }

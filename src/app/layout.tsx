@@ -1,10 +1,10 @@
-// Final font stabilization
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/providers/ThemeProvider";
-
 import { AuthProvider } from "@/providers/AuthProvider";
 import { BottomNav } from "@/components/layout/BottomNav";
+import FcmManager from "@/components/FcmManager";
+import BiometricGuard from "@/components/BiometricGuard";
 
 export const metadata: Metadata = {
   title: "DuesApp - Smart Loan Reminders",
@@ -37,10 +37,13 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <AuthProvider>
-            <main className="min-h-screen relative overflow-x-hidden">
-              {children}
-            </main>
-            <BottomNav />
+            <FcmManager />
+            <BiometricGuard>
+              <main className="min-h-screen relative overflow-x-hidden">
+                {children}
+              </main>
+              <BottomNav />
+            </BiometricGuard>
           </AuthProvider>
         </ThemeProvider>
       </body>

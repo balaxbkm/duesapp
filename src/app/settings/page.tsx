@@ -5,10 +5,17 @@ import Link from 'next/link';
 
 import { useTheme } from '@/providers/ThemeProvider';
 
+interface SettingsState {
+    notifications: boolean;
+    biometric: boolean;
+    currency: string;
+    pin: string;
+}
+
 export default function SettingsPage() {
     const { theme, toggleTheme } = useTheme();
 
-    const [settings, setSettings] = useState({
+    const [settings, setSettings] = useState<SettingsState>({
         notifications: true,
         biometric: false,
         currency: 'INR',
@@ -27,6 +34,8 @@ export default function SettingsPage() {
     // Load settings on mount
     useEffect(() => {
         const loadSettings = () => {
+            if (typeof window === 'undefined') return;
+
             const storedCurrency = localStorage.getItem('settings_currency') || 'INR';
             const storedNotif = localStorage.getItem('settings_notifications') === 'true';
             const storedBio = localStorage.getItem('settings_biometric') === 'true';
@@ -47,10 +56,9 @@ export default function SettingsPage() {
         setTimeout(() => setToastMessage(null), 3000);
     };
 
-    const updateSetting = (key: string, value: any) => {
-        if (key === 'darkMode') {
-            toggleTheme();
-            return;
+    const updateSetting = (key: keyof SettingsState, value: any) => {
+        if (key === 'notifications' || key === 'biometric') { // Boolean toggle handled by generic logic if keys match
+            // logic is generic below
         }
 
         setSettings(prev => ({ ...prev, [key]: value }));
@@ -60,6 +68,52 @@ export default function SettingsPage() {
             showToast(`${key.charAt(0).toUpperCase() + key.slice(1)} updated`);
         }
     };
+
+    const handlePinInput = (num: number) => {
+        if (pinInput.length < 4) {
+            setPinInput(prev => prev + num);
+        }
+    };
+
+    const handlePinBackspace = () => {
+        setPinInput(prev => prev.slice(0, -1));
+    };
+
+    const handlePinSubmit = () => {
+        if (pinInput.length !== 4) return;
+
+        if (pinStep === 'verify') {
+            if (pinInput === settings.pin) {
+                setPinStep('new');
+                setPinInput("");
+            } else {
+                showToast("Incorrect PIN");
+                setPinInput("");
+            }
+        } else if (pinStep === 'new') {
+            setTempNewPin(pinInput);
+            setPinStep('confirm');
+            setPinInput("");
+        } else if (pinStep === 'confirm') {
+            if (pinInput === tempNewPin) {
+                updateSetting('pin', pinInput);
+                showToast("PIN Updated Successfully");
+                setShowPinModal(false);
+                resetPinState();
+            } else {
+                showToast("PINs do not match. Try again.");
+                setPinStep('new');
+                setPinInput("");
+                setTempNewPin("");
+            }
+        }
+    };
+
+    const resetPinState = () => {
+        setPinInput("");
+        setPinStep("verify");
+        setTempNewPin("");
+    }
 
     const currencies = [
         { code: 'USD', name: 'US Dollar ($)' },
@@ -148,7 +202,10 @@ export default function SettingsPage() {
                         icon={Lock}
                         title="Change PIN"
                         type="modal"
-                        onClick={() => setShowPinModal(true)}
+                        onClick={() => {
+                            resetPinState();
+                            setShowPinModal(true);
+                        }}
                     />
                 </div>
 
@@ -159,7 +216,10 @@ export default function SettingsPage() {
                         title="Dark Mode"
                         subtitle={theme === 'dark' ? "On" : "Off"}
                         value={theme === 'dark'}
-                        onClick={(val: boolean) => updateSetting('darkMode', val)}
+                        onClick={(val: boolean) => {
+                            toggleTheme();
+                            // Optionally save per intent if needed, but ThemeProvider usually handles it
+                        }}
                     />
                 </div>
             </div>
@@ -222,9 +282,7 @@ export default function SettingsPage() {
                             {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
                                 <button
                                     key={num}
-                                    onClick={() => {
-                                        if (pinInput.length < 4) setPinInput(prev => prev + num);
-                                    }}
+                                    onClick={() => handlePinInput(num)}
                                     className="h-12 rounded-full bg-accent text-foreground font-bold text-lg hover:bg-muted active:scale-95 transition-all"
                                 >
                                     {num}
@@ -232,15 +290,13 @@ export default function SettingsPage() {
                             ))}
                             <div />
                             <button
-                                onClick={() => {
-                                    if (pinInput.length < 4) setPinInput(prev => prev + "0");
-                                }}
+                                onClick={() => handlePinInput(0)}
                                 className="h-12 rounded-full bg-accent text-foreground font-bold text-lg hover:bg-muted active:scale-95 transition-all"
                             >
                                 0
                             </button>
                             <button
-                                onClick={() => setPinInput(prev => prev.slice(0, -1))}
+                                onClick={handlePinBackspace}
                                 className="h-12 rounded-full bg-transparent text-muted-foreground flex items-center justify-center hover:text-foreground active:scale-95 transition-all"
                             >
                                 <ArrowLeft size={24} />
@@ -251,44 +307,14 @@ export default function SettingsPage() {
                             <button
                                 onClick={() => {
                                     setShowPinModal(false);
-                                    setPinInput("");
-                                    setPinStep("verify");
+                                    resetPinState();
                                 }}
                                 className="flex-1 py-3 rounded-full bg-accent text-foreground font-bold text-sm hover:bg-muted"
                             >
                                 Cancel
                             </button>
                             <button
-                                onClick={() => {
-                                    if (pinInput.length !== 4) return;
-
-                                    if (pinStep === 'verify') {
-                                        if (pinInput === (settings as any).pin) {
-                                            setPinStep('new');
-                                            setPinInput("");
-                                        } else {
-                                            showToast("Incorrect PIN");
-                                            setPinInput("");
-                                        }
-                                    } else if (pinStep === 'new') {
-                                        setTempNewPin(pinInput);
-                                        setPinStep('confirm');
-                                        setPinInput("");
-                                    } else if (pinStep === 'confirm') {
-                                        if (pinInput === tempNewPin) {
-                                            updateSetting('pin', pinInput); // Save the new PIN
-                                            showToast("PIN Updated Successfully");
-                                            setShowPinModal(false);
-                                            setPinStep('verify');
-                                            setPinInput("");
-                                            setTempNewPin("");
-                                        } else {
-                                            showToast("PINs do not match");
-                                            setPinStep('new');
-                                            setPinInput("");
-                                        }
-                                    }
-                                }}
+                                onClick={handlePinSubmit}
                                 disabled={pinInput.length !== 4}
                                 className={`flex-1 py-3 rounded-full font-bold text-sm transition-all ${pinInput.length === 4 ? 'bg-neon-lime text-black hover:brightness-110 shadow-[0_0_15px_rgba(223,255,79,0.3)]' : 'bg-muted text-muted-foreground cursor-not-allowed'}`}
                             >

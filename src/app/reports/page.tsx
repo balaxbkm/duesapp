@@ -6,22 +6,20 @@ import { ArrowLeft, TrendingUp, DollarSign, Calendar, IndianRupee, Euro, PoundSt
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTheme } from '@/providers/ThemeProvider';
-import { formatCurrency } from '@/lib/utils';
-
-const data = [
-    { name: 'Jan', total: 1200 },
-    { name: 'Feb', total: 900 },
-    { name: 'Mar', total: 1600 },
-    { name: 'Apr', total: 1100 },
-    { name: 'May', total: 2000 },
-    { name: 'Jun', total: 800 },
-];
+import { formatCurrency, formatCompactCurrency } from '@/lib/utils';
+import { db } from '@/lib/firebase';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
 
 export default function ReportsPage() {
     const { user, loading } = useAuth();
     const router = useRouter();
     const { theme } = useTheme();
     const [currency, setCurrency] = useState('INR');
+
+    // Realtime States
+    const [totalPaid, setTotalPaid] = useState(0);
+    const [pendingAmount, setPendingAmount] = useState(0);
+    const [chartData, setChartData] = useState<{ name: string, total: number }[]>([]);
 
     useEffect(() => {
         if (!loading && !user) {
@@ -35,6 +33,73 @@ export default function ReportsPage() {
             if (saved) setCurrency(saved);
         }
     }, []);
+
+    // Realtime Data Subscription
+    useEffect(() => {
+        if (!user) return;
+
+        // 1. Listen to Loans for Pending Amount
+        const loansQuery = query(collection(db, 'loans'), where('user_id', '==', user.uid));
+        const unsubLoans = onSnapshot(loansQuery, (snapshot) => {
+            const pending = snapshot.docs.reduce((acc, doc) => {
+                const data = doc.data();
+                return acc + (Number(data.outstanding_amount) || 0);
+            }, 0);
+            setPendingAmount(pending);
+        });
+
+        // 2. Listen to Payments for Total Paid & Chart Data
+        const paymentsQuery = query(collection(db, 'payments'), where('user_id', '==', user.uid));
+        const unsubPayments = onSnapshot(paymentsQuery, (snapshot) => {
+            let total = 0;
+
+            // Prepare last 6 months buckets
+            const monthsMap = new Map<string, number>();
+            const today = new Date();
+            for (let i = 5; i >= 0; i--) {
+                const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+                const monthName = d.toLocaleString('default', { month: 'short' });
+                monthsMap.set(monthName, 0);
+            }
+
+            snapshot.docs.forEach(doc => {
+                const data = doc.data();
+                const amt = Number(data.amount) || 0;
+                total += amt;
+
+                // Chart aggregation
+                let dateObj: Date | null = null;
+                if (data.paid_on?.toDate) {
+                    dateObj = data.paid_on.toDate();
+                } else if (typeof data.paid_on === 'string') {
+                    dateObj = new Date(data.paid_on);
+                }
+
+                if (dateObj) {
+                    const monthKey = dateObj.toLocaleString('default', { month: 'short' });
+                    // Only sum if it falls in our last 6 months window (bucket exists)
+                    if (monthsMap.has(monthKey)) {
+                        // Check if year also matches for stricter accuracy? 
+                        // For simplicity in this view, assuming recent data or cyclic. 
+                        // To be strict: check if date is within the window.
+                        const diffTime = Math.abs(today.getTime() - dateObj.getTime());
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                        if (diffDays <= 185) { // Roughly 6 months
+                            monthsMap.set(monthKey, (monthsMap.get(monthKey) || 0) + amt);
+                        }
+                    }
+                }
+            });
+
+            setTotalPaid(total);
+            setChartData(Array.from(monthsMap, ([name, total]) => ({ name, total })));
+        });
+
+        return () => {
+            unsubLoans();
+            unsubPayments();
+        };
+    }, [user]);
 
     if (!user) return null;
 
@@ -56,7 +121,7 @@ export default function ReportsPage() {
                         <TrendingUp size={16} />
                     </div>
                     <p className="text-[10px] text-muted-foreground mb-0.5">Total Paid</p>
-                    <p className="text-lg font-bold text-foreground">{formatCurrency(4200)}</p>
+                    <p className="text-lg font-bold text-foreground">{formatCurrency(totalPaid)}</p>
                 </div>
                 <div className="bg-card p-4 rounded-[18px] border border-border">
                     <div className="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 mb-2">
@@ -66,7 +131,7 @@ export default function ReportsPage() {
                                     <DollarSign size={16} />}
                     </div>
                     <p className="text-[10px] text-muted-foreground mb-0.5">Pending</p>
-                    <p className="text-lg font-bold text-foreground">{formatCurrency(12800)}</p>
+                    <p className="text-lg font-bold text-foreground">{formatCurrency(pendingAmount)}</p>
                 </div>
             </div>
 
@@ -77,7 +142,7 @@ export default function ReportsPage() {
                 </h2>
                 <div className="h-[250px] w-full *:focus:outline-none focus:outline-none [&_.recharts-wrapper]:!outline-none [&_.recharts-surface]:!outline-none" style={{ outline: 'none' }}>
                     <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={data} margin={{ top: 20, right: 0, left: -24, bottom: 0 }}>
+                        <BarChart data={chartData} margin={{ top: 20, right: 0, left: -24, bottom: 0 }}>
                             <defs>
                                 <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
                                     <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={1} />
@@ -97,7 +162,7 @@ export default function ReportsPage() {
                                 fontSize={12}
                                 tickLine={false}
                                 axisLine={false}
-                                tickFormatter={(value) => formatCurrency(value)}
+                                tickFormatter={(value) => formatCompactCurrency(value)}
                                 dx={-4}
                                 width={60}
                             />
@@ -134,7 +199,12 @@ export default function ReportsPage() {
             <div className="bg-card p-6 rounded-[32px] border border-border">
                 <h2 className="text-foreground font-bold mb-4">Insights</h2>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                    You have paid <strong className="text-foreground">25%</strong> of your total debt this year. At this rate, you will stand debt-free by <strong className="text-foreground">August 2026</strong>. Great job keeping up with your EMIs!
+                    {/* Simple dynamic insight */}
+                    {totalPaid > 0 && pendingAmount > 0
+                        ? `You have paid ${formatCurrency(totalPaid)} so far. Keep it up!`
+                        : totalPaid > 0 && pendingAmount === 0
+                            ? "You are completely debt free! Amazing job!"
+                            : "Start adding loans and tracking your payments to see insights here."}
                 </p>
             </div>
         </div>

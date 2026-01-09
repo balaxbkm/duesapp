@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/AuthContext';
 import { createLoan } from '@/services/loanService';
 import { LoanType, PaymentFrequency } from '@/types';
-import { Loader2, ArrowLeft, Check, Calendar as CalendarIcon, DollarSign, User, Repeat } from 'lucide-react';
+import { Loader2, ArrowLeft, Check, Calendar as CalendarIcon, DollarSign, User, Repeat, Percent } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils'; // Assuming cn utility exists
 
@@ -27,7 +27,8 @@ export default function AddLoanPage() {
         start_date: new Date().toISOString().split('T')[0],
         due_date: '',
         frequency: 'monthly' as PaymentFrequency,
-        notes: ''
+        notes: '',
+        interest_rate: ''
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -49,7 +50,8 @@ export default function AddLoanPage() {
                 next_due_date: formData.due_date, // Initial next due date is the first due date
                 frequency: formData.frequency,
                 status: 'active',
-                notes: formData.notes
+                notes: formData.notes,
+                interest_rate: formData.interest_rate ? Number(formData.interest_rate) : 0
             });
             router.push('/dashboard');
         } catch (error) {
@@ -136,19 +138,36 @@ export default function AddLoanPage() {
                         </div>
                     </div>
 
-                    <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1 tracking-wider">Repayment Frequency</label>
-                        <div className="relative">
-                            <Repeat className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-                            <select
-                                value={formData.frequency}
-                                onChange={e => setFormData({ ...formData, frequency: e.target.value as PaymentFrequency })}
-                                className="w-full pl-12 pr-4 py-2.5 rounded-xl bg-card border border-border text-foreground focus:outline-none focus:border-neon-lime/50 focus:ring-1 focus:ring-neon-lime/50 font-medium appearance-none transition-all text-sm"
-                            >
-                                <option value="monthly">Monthly</option>
-                                <option value="weekly">Weekly</option>
-                                <option value="custom">One-time / Custom</option>
-                            </select>
+
+
+                    <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1 tracking-wider">Interest Rate (%)</label>
+                            <div className="relative">
+                                <Percent className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+                                <input
+                                    type="number"
+                                    placeholder="0"
+                                    value={formData.interest_rate}
+                                    onChange={e => setFormData({ ...formData, interest_rate: e.target.value })}
+                                    className="w-full pl-12 pr-4 py-2.5 rounded-xl bg-card border border-border text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-neon-lime/50 focus:ring-1 focus:ring-neon-lime/50 font-medium transition-all text-sm"
+                                />
+                            </div>
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1 tracking-wider">Repayment Frequency</label>
+                            <div className="relative">
+                                <Repeat className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+                                <select
+                                    value={formData.frequency}
+                                    onChange={e => setFormData({ ...formData, frequency: e.target.value as PaymentFrequency })}
+                                    className="w-full pl-12 pr-4 py-2.5 rounded-xl bg-card border border-border text-foreground focus:outline-none focus:border-neon-lime/50 focus:ring-1 focus:ring-neon-lime/50 font-medium appearance-none transition-all text-sm"
+                                >
+                                    <option value="monthly">Monthly</option>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="custom">One-time / Custom</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
@@ -182,7 +201,7 @@ export default function AddLoanPage() {
                     <div className="space-y-1.5">
                         <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1 tracking-wider">Notes (Optional)</label>
                         <textarea
-                            rows={2}
+                            rows={4}
                             placeholder="Any usage details..."
                             value={formData.notes}
                             onChange={e => setFormData({ ...formData, notes: e.target.value })}
@@ -199,7 +218,7 @@ export default function AddLoanPage() {
                     {submitting ? <Loader2 className="animate-spin" /> : <Check size={18} strokeWidth={3} />}
                     Save Loan
                 </button>
-            </form>
+            </form >
         </div >
     );
 }

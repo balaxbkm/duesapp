@@ -50,3 +50,22 @@ export const createNotification = async (notification: Omit<Notification, 'id'>)
         console.error("Error creating notification:", error);
     }
 };
+
+export const deleteAllNotifications = async (userId: string) => {
+    try {
+        const q = query(
+            collection(db, 'notifications'),
+            where('userId', '==', userId)
+        );
+        const snapshot = await getDocs(q);
+        const batch = writeBatch(db);
+        snapshot.docs.forEach(doc => {
+            batch.delete(doc.ref);
+        });
+        await batch.commit();
+        return true;
+    } catch (error) {
+        console.error("Error deleting all notifications:", error);
+        return false;
+    }
+};

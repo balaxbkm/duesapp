@@ -2,15 +2,18 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/providers/AuthContext';
 import { getDashboardStats, makePayment } from '@/services/loanService';
+import { useTheme } from '@/providers/ThemeProvider';
 import { Loan } from '@/types';
-import { Loader2, TrendingUp, ChevronDown, CheckCircle2, Wallet, Plus, Bell, Grid, PieChart, X } from 'lucide-react';
+import { Loader2, TrendingUp, ChevronDown, CheckCircle2, Wallet, Plus, Bell, Grid, PieChart, X, Moon, Sun } from 'lucide-react';
 import { formatCurrency, formatDate, cn } from '@/lib/utils';
+import { addMonths, addWeeks } from 'date-fns';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
 export default function Dashboard() {
     const { user, loading } = useAuth();
+    const { theme, toggleTheme } = useTheme();
     const router = useRouter();
     const [stats, setStats] = useState<{
         totalToPay: number;
@@ -29,10 +32,64 @@ export default function Dashboard() {
         }
     }, [user, loading, router]);
 
-    // Payment Modal State
-    const [paymentModalOpen, setPaymentModalOpen] = useState(false);
-    const [selectedLoan, setSelectedLoan] = useState<Loan | null>(null);
-    const [payAmount, setPayAmount] = useState('');
+    // Toast State
+    const [toast, setToast] = useState<{ message: string; show: boolean }>({ message: '', show: false });
+
+    const showToast = (message: string) => {
+        setToast({ message, show: true });
+        setTimeout(() => setToast(prev => ({ ...prev, show: false })), 3000);
+    };
+
+    // Quick Payment Logic
+    const handleQuickPayment = async (loan: Loan) => {
+        let amount = loan.outstanding_amount;
+        if (loan.frequency === 'monthly' || loan.frequency === 'weekly') {
+            if (loan.emi_amount > 0) {
+                amount = Math.min(loan.emi_amount, loan.outstanding_amount);
+            }
+        }
+
+        if (typeof window !== 'undefined' && window.confirm(`Are you sure you want to pay ${formatCurrency(amount)} for ${loan.title}?`)) {
+            try {
+                // Calculate next due date
+                let nextDueDate = new Date();
+                const currentDueDate = loan.next_due_date ? new Date(loan.next_due_date) : new Date(loan.due_date);
+
+                if (loan.frequency === 'monthly') {
+                    nextDueDate = addMonths(currentDueDate, 1);
+                } else if (loan.frequency === 'weekly') {
+                    nextDueDate = addWeeks(currentDueDate, 1);
+                } else {
+                    nextDueDate = currentDueDate; // For custom, maybe don't move it automatically or keep same
+                }
+
+                await makePayment(loan.id!, amount, nextDueDate);
+                showToast("Payment Successful");
+
+                // Optimistic Update
+                setStats(prev => {
+                    if (!prev) return null;
+                    const updatedLoans = prev.allLoans.map(l =>
+                        l.id === loan.id
+                            ? {
+                                ...l,
+                                outstanding_amount: Math.max(0, l.outstanding_amount - amount),
+                                next_due_date: nextDueDate.toISOString()
+                            }
+                            : l
+                    );
+                    return {
+                        ...prev,
+                        totalToPay: Math.max(0, prev.totalToPay - amount),
+                        allLoans: updatedLoans
+                    };
+                });
+            } catch (e) {
+                console.error(e);
+                alert("Payment failed");
+            }
+        }
+    };
 
     useEffect(() => {
         async function loadStats() {
@@ -52,40 +109,7 @@ export default function Dashboard() {
         loadStats();
     }, [user, loading]);
 
-    const handleOpenPaymentModal = (loan: Loan) => {
-        setSelectedLoan(loan);
-        setPayAmount(loan.emi_amount.toString());
-        setPaymentModalOpen(true);
-    };
 
-    const handleProcessPayment = async () => {
-        if (!selectedLoan || !payAmount || !user) return;
-        const amount = Number(payAmount);
-        try {
-            await makePayment(selectedLoan.id!, amount, new Date());
-            setPaymentModalOpen(false);
-
-            // Optimistic Update
-            setStats(prev => {
-                if (!prev) return null;
-                const updatedLoans = prev.allLoans.map(l =>
-                    l.id === selectedLoan.id
-                        ? { ...l, outstanding_amount: Math.max(0, l.outstanding_amount - amount) }
-                        : l
-                );
-                // Simplify: Just updating the specific loan in the list and totalToPay
-                return {
-                    ...prev,
-                    totalToPay: Math.max(0, prev.totalToPay - amount),
-                    allLoans: updatedLoans
-                    // upcoming/recent might need update too in a real full app, but this covers the main view
-                };
-            });
-        } catch (e) {
-            console.error(e);
-            alert("Payment failed");
-        }
-    };
 
     const filteredLoans = stats?.allLoans?.filter(loan => {
         if (filter === 'All') return true;
@@ -120,7 +144,40 @@ export default function Dashboard() {
                     </div>
                     <span className="font-bold mt-0.5">DuesApp</span>
                 </h1>
-                <div className="relative">
+                <button
+                    onClick={toggleTheme}
+                    className="w-9 h-9 rounded-full bg-accent/50 hover:bg-accent border border-border flex items-center justify-center transition-all hover:scale-105 active:scale-95"
+                >
+                    {theme === 'dark' ? <Sun size={16} className="text-yellow-400" /> : <Moon size={16} className="text-foreground" />}
+                </button>
+            </div>
+
+            {/* Hero Stats */}
+            <div className="mb-5 relative">
+                <div className="flex items-center justify-between mt-14 mb-6">
+                    <h2 className="text-4xl font-bold text-foreground tracking-tighter">{formatCurrency(stats?.totalToPay || 0)}</h2>
+                    <Link href="/add" className="w-9 h-9 flex items-center justify-center btn-neon">
+                        <Plus size={20} strokeWidth={2.5} />
+                    </Link>
+                </div>
+
+                {/* Progress Bar Container */}
+                <div className="flex justify-between text-xs text-muted-foreground mb-2 font-medium tracking-wide">
+                    <span>Paid So Far</span>
+                    <span className="text-neon-purple font-bold tracking-normal">{formatCurrency(totalPaidSoFar)}</span>
+                </div>
+                <div className="h-3 w-full bg-card border border-border/50 rounded-full overflow-hidden relative">
+                    <div
+                        className="h-full bg-primary rounded-full shadow-[0_0_15px_rgba(171,211,0,0.4)]"
+                        style={{ width: `${progressPercent}%` }}
+                    ></div>
+                    {/* Striped Pattern Overlay */}
+                    <div className="absolute top-0 right-0 h-full w-full opacity-20" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 4px, #000 4px, #000 8px)' }}></div>
+                </div>
+
+                {/* Filter Dropdown (Moved) */}
+                <div className="relative flex items-center justify-between mt-7">
+                    <h3 className="text-xl font-bold text-foreground tracking-tight">My Loans</h3>
                     <div className="flex items-center gap-2">
                         <div className="h-8 px-4 rounded-full bg-primary/10 text-primary text-[10px] font-bold tracking-wider min-w-[3.5rem] flex items-center justify-center uppercase">
                             {filter}
@@ -163,70 +220,69 @@ export default function Dashboard() {
                 </div>
             </div>
 
-            {/* Hero Stats */}
-            <div className="mb-10 relative">
-                <div className="flex items-center justify-between mt-14 mb-6">
-                    <h2 className="text-4xl font-bold text-foreground tracking-tighter">{formatCurrency(stats?.totalToPay || 0)}</h2>
-                    <Link href="/add" className="w-10 h-10 flex items-center justify-center btn-neon">
-                        <Plus size={20} strokeWidth={2.5} />
-                    </Link>
-                </div>
-
-                {/* Progress Bar Container */}
-                <div className="flex justify-between text-xs text-muted-foreground mb-2 font-medium tracking-wide">
-                    <span>Paid So Far</span>
-                    <span className="text-neon-purple font-bold tracking-normal">{formatCurrency(totalPaidSoFar)}</span>
-                </div>
-                <div className="h-3 w-full bg-card border border-border/50 rounded-full overflow-hidden relative">
-                    <div
-                        className="h-full bg-primary rounded-full shadow-[0_0_15px_rgba(171,211,0,0.4)]"
-                        style={{ width: `${progressPercent}%` }}
-                    ></div>
-                    {/* Striped Pattern Overlay */}
-                    <div className="absolute top-0 right-0 h-full w-full opacity-20" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 4px, #000 4px, #000 8px)' }}></div>
-                </div>
-            </div>
-
             {/* Loan List */}
-            <div className="space-y-4">
+            <div className="space-y-3">
                 {filteredLoans.length > 0 ? (
-                    filteredLoans.map((loan) => (
-                        <div key={loan.id} className="group relative">
-                            {/* Main Card Link */}
-                            <Link href={`/loans/${loan.id}`} className="absolute inset-0 z-0 rounded-[24px] ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" />
+                    filteredLoans.map((loan) => {
+                        const paidPercentage = loan.principal_amount > 0
+                            ? Math.max(0, Math.min(100, ((loan.principal_amount - loan.outstanding_amount) / loan.principal_amount) * 100))
+                            : 0;
+                        const isClosed = loan.status === 'closed' || loan.outstanding_amount <= 0;
 
-                            <div className="dark-card p-4 relative overflow-hidden bg-card group-hover:bg-accent/40 transition-all border border-border rounded-[24px] pointer-events-none">
-                                {/* Action Button - Higher Z-Index and interactive */}
-                                <button
-                                    onClick={(e) => {
-                                        e.preventDefault(); // Prevent Link navigation
-                                        handleOpenPaymentModal(loan);
-                                    }}
-                                    className="btn-neon text-[10px] w-24 px-0 py-2.5 absolute top-5 right-5 pointer-events-auto z-10 hover:scale-105 active:scale-95 transition-transform flex items-center justify-center"
-                                >
-                                    {formatCurrency(loan.emi_amount || loan.outstanding_amount)}
-                                </button>
+                        let displayAmount = loan.outstanding_amount;
+                        if (loan.frequency === 'monthly' || loan.frequency === 'weekly') {
+                            if (loan.emi_amount > 0) {
+                                displayAmount = Math.min(loan.emi_amount, loan.outstanding_amount);
+                            }
+                        }
 
-                                <div className="flex items-start gap-4">
-                                    {/* Icon with Ring */}
-                                    <div className="relative w-10 h-10 flex items-center justify-center">
-                                        <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 36 36">
-                                            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" className="stroke-muted" strokeWidth="2" />
-                                            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="hsl(var(--neon-lime))" strokeWidth="2" strokeDasharray="60, 100" />
-                                        </svg>
-                                        <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-muted-foreground z-10">
-                                            <Wallet size={16} />
+                        return (
+                            <div key={loan.id} className="group relative">
+                                {/* Main Card Link */}
+                                <Link href={`/loans/${loan.id}`} className="absolute inset-0 z-0 rounded-[24px] ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" />
+
+                                <div className={cn(
+                                    "dark-card p-4 relative overflow-hidden bg-card group-hover:bg-accent/40 transition-all border border-border rounded-[24px] pointer-events-none",
+                                    isClosed && "opacity-50 grayscale-[0.5]"
+                                )}>
+                                    {/* Action Button - Higher Z-Index and interactive */}
+                                    {isClosed ? (
+                                        <div className="absolute top-5 right-5 z-10 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider border border-primary/20">
+                                            Completed
                                         </div>
-                                    </div>
+                                    ) : (
+                                        <button
+                                            onClick={(e) => {
+                                                e.preventDefault(); // Prevent Link navigation
+                                                handleQuickPayment(loan);
+                                            }}
+                                            className="btn-neon text-[10px] w-24 px-0 py-2.5 absolute top-5 right-5 pointer-events-auto z-10 hover:scale-105 active:scale-95 transition-transform flex items-center justify-center"
+                                        >
+                                            {formatCurrency(displayAmount)}
+                                        </button>
+                                    )}
 
-                                    <div className="mt-1">
-                                        <h3 className="text-base font-bold text-foreground tracking-wide">{loan.title}</h3>
-                                        <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">Due by {formatDate(loan.next_due_date || loan.due_date)}</p>
+                                    <div className="flex items-start gap-4">
+                                        {/* Icon with Ring */}
+                                        <div className="relative w-10 h-10 flex items-center justify-center">
+                                            <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 36 36">
+                                                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" className="stroke-gray-700" strokeWidth="2" />
+                                                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="hsl(var(--neon-lime))" strokeWidth="2" strokeDasharray={`${paidPercentage}, 100`} />
+                                            </svg>
+                                            <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-muted-foreground z-10">
+                                                <Wallet size={16} />
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-1">
+                                            <h3 className="text-base font-bold text-foreground tracking-wide">{loan.title}</h3>
+                                            <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">Due by {formatDate(loan.next_due_date || loan.due_date)}</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    ))
+                        );
+                    })
                 ) : (
                     <div className="relative w-full flex flex-col items-center justify-center text-center min-h-[60vh]">
                         {/* Background Glow */}
@@ -259,56 +315,13 @@ export default function Dashboard() {
             </div>
 
             {/* Payment Modal */}
-            {paymentModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="bg-card w-full max-w-sm rounded-[24px] p-5 shadow-2xl border border-border/50 relative scale-in-95 animate-in zoom-in-95 duration-200">
-                        <button
-                            onClick={() => setPaymentModalOpen(false)}
-                            className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-accent text-muted-foreground hover:text-foreground hover:bg-accent/80 transition-colors"
-                        >
-                            <X size={16} />
-                        </button>
-
-                        <div className="flex flex-col items-center mb-5">
-                            <div className="w-12 h-12 rounded-full bg-neon-purple/10 flex items-center justify-center text-neon-purple mb-3">
-                                <Wallet size={24} />
-                            </div>
-                            <h2 className="text-lg font-bold text-foreground">Make Payment</h2>
-                            <p className="text-xs text-muted-foreground">{selectedLoan?.title}</p>
-                        </div>
-
-                        <div className="mb-5">
-                            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider ml-1 mb-1.5 block">Amount</label>
-                            <div className="relative">
-                                <div className="absolute left-6 top-1/2 -translate-y-1/2 text-2xl font-bold text-muted-foreground">
-                                    {/* Try to reuse symbol logic broadly or default */}
-                                    {(() => {
-                                        if (typeof window === 'undefined') return '₹';
-                                        const c = localStorage.getItem('settings_currency');
-                                        if (c === 'USD') return '$';
-                                        if (c === 'EUR') return '€';
-                                        if (c === 'GBP') return '£';
-                                        return '₹';
-                                    })()}
-                                </div>
-                                <input
-                                    type="number"
-                                    className="w-full bg-accent/50 border border-border/50 rounded-[16px] py-3 pl-12 pr-4 text-center text-2xl font-bold text-foreground focus:outline-none focus:border-neon-purple/50 focus:ring-4 focus:ring-neon-purple/10 transition-all placeholder:text-muted-foreground/20"
-                                    placeholder="0"
-                                    value={payAmount}
-                                    onChange={(e) => setPayAmount(e.target.value)}
-                                    autoFocus
-                                />
-                            </div>
-                        </div>
-
-                        <button
-                            onClick={handleProcessPayment}
-                            className="w-full py-3 rounded-xl bg-neon-purple text-white font-bold text-base hover:brightness-110 active:scale-95 transition-all shadow-[0_8px_20px_-4px_rgba(124,58,237,0.5)]"
-                        >
-                            Confirm Payment
-                        </button>
+            {/* Toast Notification */}
+            {toast.show && (
+                <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[100] bg-zinc-900 text-white px-6 py-3 rounded-full shadow-2xl animate-in slide-in-from-bottom-5 fade-in duration-300 font-bold text-sm tracking-wide flex items-center gap-3 border border-zinc-800 whitespace-nowrap">
+                    <div className="w-5 h-5 rounded-full bg-neon-lime text-black flex items-center justify-center">
+                        <CheckCircle2 size={12} strokeWidth={4} />
                     </div>
+                    {toast.message}
                 </div>
             )}
         </div>

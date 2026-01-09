@@ -17,6 +17,7 @@ export interface Loan {
     created_at: number; // Timestamp
     next_due_date?: string;
     notes?: string;
+    interest_rate?: number;
 }
 
 export interface Payment {

@@ -23,11 +23,13 @@ const functions = getFunctions(app);
 const storage = getStorage(app);
 
 // Messaging is only supported in window environment
-let messaging = null;
+let messaging: any = null;
 if (typeof window !== "undefined") {
-    // messaging = getMessaging(app); 
-    // Note: FCM requires a service worker and VAPID key setup. 
-    // Initializing it conditionally to prevent SSR errors.
+    try {
+        messaging = getMessaging(app);
+    } catch (e) {
+        console.log("Firebase Messaging not supported in this browser or context.");
+    }
 }
 
 export { app, auth, db, functions, messaging, storage };

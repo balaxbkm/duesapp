@@ -7,6 +7,7 @@ import {
     addDoc,
     updateDoc,
     doc,
+    deleteDoc,
     Timestamp,
     orderBy,
     limit,
@@ -81,11 +82,14 @@ export const makePayment = async (
 
             const newStatus: LoanStatus = newOutstanding <= 0 ? 'closed' : 'active';
 
+            // Ensure nextDueDate is valid
+            const validNextDueDate = isNaN(nextDueDate.getTime()) ? new Date() : nextDueDate;
+
             // Update Loan
             transaction.update(loanRef, {
                 outstanding_amount: newOutstanding,
                 status: newStatus,
-                next_due_date: Timestamp.fromDate(nextDueDate)
+                next_due_date: Timestamp.fromDate(validNextDueDate)
             });
 
             // Create Payment Record
@@ -95,7 +99,7 @@ export const makePayment = async (
                 user_id: loanData.user_id,
                 amount: paymentAmount,
                 paid_on: Timestamp.now(),
-                next_due_date: Timestamp.fromDate(nextDueDate)
+                next_due_date: Timestamp.fromDate(validNextDueDate)
             });
         });
         return true;
@@ -104,6 +108,43 @@ export const makePayment = async (
         throw e;
     }
 }
+
+export const deleteLoan = async (loanId: string) => {
+    try {
+        await deleteDoc(doc(db, LOANS_COLLECTION, loanId));
+        return true;
+    } catch (error) {
+        console.error("Error deleting loan: ", error);
+        throw error;
+    }
+};
+
+export const getLoanPayments = async (loanId: string, userId: string) => {
+    try {
+        const q = query(
+            collection(db, PAYMENTS_COLLECTION),
+            where("loan_id", "==", loanId),
+            where("user_id", "==", userId)
+            // orderBy("paid_on", "desc") // Avoiding composite index issues initially
+        );
+        const querySnapshot = await getDocs(q);
+        const payments = querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                ...data,
+                paid_on: data.paid_on.toDate().toISOString(),
+                next_due_date: data.next_due_date.toDate().toISOString()
+            } as Payment;
+        });
+
+        // Local sort
+        return payments.sort((a, b) => new Date(b.paid_on).getTime() - new Date(a.paid_on).getTime());
+    } catch (error) {
+        console.error("Error getting loan payments: ", error);
+        return [];
+    }
+};
 
 export const getDashboardStats = async (userId: string) => {
     const loans = await getUserLoans(userId);
